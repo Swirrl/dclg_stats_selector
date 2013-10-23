@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", "~> 3.2.13"
+  s.add_dependency "publish_my_data"
   s.add_dependency "jquery-rails"
   s.add_dependency "haml"
   s.add_dependency "sparql-client"

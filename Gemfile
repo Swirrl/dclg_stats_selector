@@ -13,7 +13,7 @@ gemspec
 # To use debugger
 # gem 'debugger'
 
-gem 'publish_my_data', path: '../publish_my_data'
+# gem 'publish_my_data', path: '../publish_my_data'
 
 group :test, :development do
   gem "rspec-rails", "~> 2.0"
