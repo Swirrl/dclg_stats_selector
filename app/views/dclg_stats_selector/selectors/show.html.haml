@@ -1,0 +1,82 @@
+- content_for :data_crumb do
+  %ol.breadcrumb
+    %li= link_to 'Home', '/'
+    %li= link_to 'Statistics Selector', '#'
+
+-# page_title "Statistics Selector: Add column data"
+
+
+%section#stats-selector.step-three
+  .row.container
+    .sixteen.columns
+      %h3 Statistics Selector
+      %h1 Step 3 of 3: Add column data
+
+      %section#preview
+        %header PREVIEW
+        %table
+          %thead
+            -# Hack to skip the dataset name, as otherwise we'd have to either
+            -# have different snapshot generation strategies for HTML and CSV,
+            -# or write a HTMLBuilder to correspond with CSVBuilder and stop using
+            -# this template (which is probably the better solution overall)
+            - @snapshot.header_rows.drop(1).each do |header_row|
+              %tr
+                %td
+                - header_row.each do |header_column|
+                  - if header_column.type == :blank
+                    %td{ colspan: header_column.width, class: dom_class_for_fragment(header_column) }
+                  - else
+                    %th.hardwrap{ colspan: header_column.width, class: dom_class_for_fragment(header_column) }= header_column.label
+          %tbody
+            - @snapshot.table_rows.each.with_index do |row, index|
+              %tr
+                %th= row.label
+                - row.each do |cell|
+                  %td{ class: dom_class_for_fragment(cell) }= cell
+                - if @selector.empty? && index == 0
+                  %td.intro{rowspan: "#{ @snapshot.table_rows.size + 1 }"}
+                    %p Get started! Add some column data from a dataset by clicking on 'Add Data' below.
+          %tfoot
+            %tr
+              %td &hellip;
+              - @selector.fragments.each do |fragment|
+                %th.fragment-actions{ colspan: fragment.volume_of_selected_cube, class: dom_class_for_fragment(fragment) }
+                  = link_to selector_fragment_path(@selector, id: fragment.id), method: :delete, class: 'btn btn-remove-data', style: 'display: none;' do
+                    %i.icon-circled-minus
+                    Remove Data
+      .actions
+        = link_to datasets_selector_fragments_path(@selector), 'class' => 'btn btn-add-data', 'data-toggle' => 'modal', 'data-target' => '#add-data-modal' do
+          %i.icon-circled-plus
+          Add Data
+        = link_to download_selector_path(@selector), class: 'btn primary' do
+          %i.icon-download
+          Download
+
+#add-data-modal(style="display: none;")
+
+
+#add-data-spinner.modal-dialog
+  .modal-content
+    .modal-body
+      %p
+        %em Loading Datasets
+      = image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'
+
+:javascript
+  var spinner = $('#add-data-spinner').detach();
+
+  $('#add-data-modal').on('hidden.bs.modal', function() {
+    $(this).removeData();
+    $('#add-data-modal').empty();
+  });
+
+  $('#add-data-modal').on('show.bs.modal', function() {
+    $('#add-data-modal').append(spinner);
+    console.log('show');
+  });
+
+  $('#add-data-modal').on('pmd.modal.loaded', function() {
+    spinner.remove();
+    console.log('shown');
+  });

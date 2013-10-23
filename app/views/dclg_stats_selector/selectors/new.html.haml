@@ -1,0 +1,29 @@
+- content_for :data_crumb do
+  %ol.breadcrumb
+    %li= link_to 'Home', '/'
+    %li= link_to 'Statistics Selector', '#'
+
+-# page_title "Statistics Selector: Upload GSS Codes"
+
+%section#stats-selector
+  .row.container
+    .sixteen.columns
+      %h3 Statistics Selector
+      %h1 Step 1 of 3: Upload GSS Codes
+  .row.container
+    .eight.columns
+      = form_tag preview_selectors_path, multipart: true do
+        %fieldset
+          %legend Select a .csv file
+          = file_field_tag :csv_upload
+          .submit.primary
+            = submit_tag 'Upload'
+          - if flash[:error]
+            .error= flash[:error]
+    .seven.columns.offset-by-one
+      :markdown
+        ### Get started
+        Upload a .csv file containing up to 500 GSS codes…
+
+        ### What's a GSS Code?
+        TBD

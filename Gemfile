@@ -15,3 +15,18 @@ gem "jquery-rails"
 
 # To use debugger
 # gem 'debugger'
+
+gem 'tripod', path: '../tripod-ash'
+gem 'publish_my_data', path: '../publish_my_data'
+
+group :test, :development do
+  gem "rspec-rails", "~> 2.0"
+  gem "fuubar" # RSpec formatter
+  gem "factory_girl_rails", "~> 4.0"
+  gem "capybara"
+  gem "launchy" # For Capybara's save_and_open_page
+  gem "ruby-prof"
+  gem "awesome_print", require: "ap"
+  gem "poltergeist"
+  gem "term-ansicolor"
+end
