@@ -12,7 +12,7 @@ module DclgStatsSelector
       end
 
       before(:each) do
-        PublishMyData.configure do |config|
+        DclgStatsSelector.configure do |config|
           config.stats_selector = {
             persistence_type:     persistence_type,
             persistence_options:  persistence_options

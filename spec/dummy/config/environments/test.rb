@@ -39,7 +39,9 @@ Dummy::Application.configure do
     config.downloads_s3_bucket = "publishmydata-dev"
     config.aws_access_key_id = "AKIAIMGJ3RKNJJ6CVGTA"
     config.aws_secret_access_key = "O0AylxAfa2dKj0eao3Y4ISYZXJrnGZyUs1U8sOlT"
+  end
 
+  DclgStatsSelector.configure do |config|
     config.stats_selector = {
       persistence_type:     :filesystem,
       persistence_options:  { path: "tmp/selectors" }

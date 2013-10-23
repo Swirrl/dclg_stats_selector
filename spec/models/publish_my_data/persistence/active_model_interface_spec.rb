@@ -8,7 +8,7 @@ module DclgStatsSelector
       # Some of the Selector methods delegate to the repository, so
       # we have to re-lint for each repository type
       before(:each) do
-        PublishMyData.configure do |config|
+        DclgStatsSelector.configure do |config|
           config.stats_selector = {
             persistence_type:     persistence_type,
             persistence_options:  persistence_options
