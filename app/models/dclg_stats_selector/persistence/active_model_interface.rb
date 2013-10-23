@@ -35,7 +35,7 @@ module DclgStatsSelector
         private
 
         def new_repository
-          config = PublishMyData.stats_selector
+          config = DclgStatsSelector.stats_selector
 
           repository_class =
             case config.fetch(:persistence_type)
