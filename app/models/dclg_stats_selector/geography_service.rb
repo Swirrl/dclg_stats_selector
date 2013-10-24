@@ -29,7 +29,7 @@ module DclgStatsSelector
         when "http://opendatacommunities.org/def/local-government/LocalAuthority"
           "?la a <http://opendatacommunities.org/def/local-government/LocalAuthority> . ?la <http://opendatacommunities.org/def/local-government/governsGSS> ?o ."
       end
-      Dataset.find_by_sparql("
+      PublishMyData::Dataset.find_by_sparql("
         SELECT DISTINCT ?uri WHERE {
           #{ filter_triples }
           ?s <http://opendatacommunities.org/def/ontology/geography/refArea> ?o .
