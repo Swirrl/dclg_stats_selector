@@ -29,7 +29,7 @@ module DclgStatsSelector
         when "http://opendatacommunities.org/def/local-government/LocalAuthority"
           "?la a <http://opendatacommunities.org/def/local-government/LocalAuthority> . ?la <http://opendatacommunities.org/def/local-government/governsGSS> ?o ."
       end
-      PublishMyData::Dataset.find_by_sparql("
+      Dataset.find_by_sparql("
         SELECT DISTINCT ?uri WHERE {
           #{ filter_triples }
           ?s <http://opendatacommunities.org/def/ontology/geography/refArea> ?o .
@@ -42,7 +42,7 @@ module DclgStatsSelector
     private
 
     def gss_codes_and_uris(gss_codes)
-      gss_code_string = gss_codes.map{ |code| %'"#{code}"'}.join(' ')
+      gss_code_string = gss_codes.map{ |code| %'"#{code}"'}.join(', ')
 
       query_results = Tripod::SparqlClient::Query.select(<<-SPARQL
         SELECT DISTINCT ?uri ?code ?type
@@ -57,8 +57,8 @@ module DclgStatsSelector
             ?la <http://opendatacommunities.org/def/local-government/governsGSS> ?uri .
             ?uri <http://data.ordnancesurvey.co.uk/ontology/admingeo/gssCode> ?code .
           }
-          VALUES ?code {#{gss_code_string}}
-          VALUES ?type {<http://opendatacommunities.org/def/geography#LSOA> <http://opendatacommunities.org/def/local-government/LocalAuthority>}
+          FILTER (?code IN (#{gss_code_string}))
+          FILTER (?type IN (<http://opendatacommunities.org/def/geography#LSOA>, <http://opendatacommunities.org/def/local-government/LocalAuthority>))
         }
         SPARQL
       )
