@@ -16,7 +16,7 @@ require 'tripod' # for some reason tripod is lazy loaded by the tests unless you
 
 Bundler.require
 
-# require "dclg_stats_selector"
+require 'publish_my_data'
 
 module Dummy
   class Application < Rails::Application
