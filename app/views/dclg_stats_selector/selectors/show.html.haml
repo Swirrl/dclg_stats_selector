@@ -19,13 +19,16 @@
             -# Hack to skip the dataset name, as otherwise we'd have to either
             -# have different snapshot generation strategies for HTML and CSV,
             -# or write a HTMLBuilder to correspond with CSVBuilder and stop using
-            -# this template (which is probably the better solution overall)
+            -# this template (which is probably the better solution overall).
+            -# Note that some datasets on opendatacommunities.org have the
+            -# measure property name "Observation" so they actually benefit from
+            -# naming the dataset, but we can't handle differences like that here.
             - @snapshot.header_rows.drop(1).each do |header_row|
               %tr
                 %td
                 - header_row.each do |header_column|
                   - if header_column.type == :blank
-                    %td{ colspan: header_column.width, class: dom_class_for_fragment(header_column) }
+                    %th{ colspan: header_column.width, class: dom_class_for_fragment(header_column) }
                   - else
                     %th.hardwrap{ colspan: header_column.width, class: dom_class_for_fragment(header_column) }= header_column.label
           %tbody

@@ -2,10 +2,9 @@ require 'spec_helper'
 
 module DclgStatsSelector
   describe Snapshot do
-    # Where's also a mock labeller in the Selector spec too
-    # (we need to merge these)
-    class MockLabeller
-      TEST_LABELS = {
+    let(:observation_source) { double(ObservationSource) }
+    let(:labeller) {
+      MockLabeller.new(
         'uri:dataset/1'           => "Dataset 1",
         'uri:dataset/2'           => "Dataset 2",
         'uri:dataset/3'           => "Dataset 3",
@@ -24,26 +23,15 @@ module DclgStatsSelector
         'uri:dim/5/a' => "Dimension 5a",
         'uri:dim/5/b' => "Dimension 5b",
         'uri:dim/6/a' => "Dimension 6a",
-        'uri:dim/6/b' => "Dimension 6b",
-        'uri:dim/7/a' => "Dimension 7a",
-        'uri:dim/7/b' => "Dimension 7b"
-      }.freeze
-
-      def label_for(uri)
-        TEST_LABELS.fetch(uri, "<label not found>")
-      end
-    end
-
-    let(:observation_source) { double(ObservationSource) }
-    let(:labeller) { MockLabeller.new }
+        'uri:dim/6/b' => "Dimension 6b"
+      )
+    }
 
     subject(:snapshot) {
       Snapshot.new(observation_source: observation_source, labeller: labeller)
     }
 
     describe "#header_rows" do
-      let(:labeller) { MockLabeller.new }
-
       def labels_for(header_rows)
         header_rows.map { |row|
           row.map { |column| column.label }
@@ -80,7 +68,7 @@ module DclgStatsSelector
         # it never happens in reality
         specify {
           expect(labels_for(snapshot.header_rows)).to be == [
-            ["Dataset 1"], ["Measure property 1"]
+            ["Dataset 1"], ["Measure property 1"], []
           ]
         }
       end
@@ -264,25 +252,18 @@ module DclgStatsSelector
           snapshot.dataset_completed
         end
 
-        # Two notes about this:
-        # 1) The measure properties and dataset URIs don't line up at
-        #    the top because writing a padding algorithm to do this
-        #    would have taken a lot longer.
-        # 2) It would be nice to have one blank column of width 2 when
-        #    we pad it all, but that would be a bit harder to implement
-        #    (maybe not massively though, I haven't looked into it)
         specify {
           expect(labels_for(snapshot.header_rows)).to be == [
-            [nil, nil, "Dataset 2"],
-            ["Dataset 1", "Measure property 2"],
-            ["Measure property 1", "Dimension 2a"],
+            ["Dataset 1", "Dataset 2"],
+            ["Measure property 1", "Measure property 2"],
+            [nil, "Dimension 2a"],
             ["Dimension 1a", "Dimension 1b", "Dimension 3a", "Dimension 3b"]
           ]
         }
 
         specify {
           expect(widths_for(snapshot.header_rows)).to be == [
-            [1, 1, 2],
+            [2, 2],
             [2, 2],
             [2, 2],
             [1, 1, 1, 1]
@@ -308,19 +289,9 @@ module DclgStatsSelector
             measure_property_uri: 'uri:measure-property/2'
           )
           snapshot.dimension_detected(
-            dimension_uri:  'uri:dimension/6',
-            column_width:   1,
-            column_uris:    ['uri:dim/6/a', 'uri:dim/6/b']
-          )
-          snapshot.dimension_detected(
-            dimension_uri:  'uri:dimension/5',
-            column_width:   2,
-            column_uris:    ['uri:dim/5/a']
-          )
-          snapshot.dimension_detected(
             dimension_uri:  'uri:dimension4',
-            column_width:   2,
-            column_uris:    ['uri:dim/4/a']
+            column_width:   1,
+            column_uris:    ['uri:dim/4/a', 'uri:dim/4/b']
           )
           snapshot.dimension_detected(
             dimension_uri:  'uri:dimension/3',
@@ -339,31 +310,27 @@ module DclgStatsSelector
             measure_property_uri: 'uri:measure-property/3'
           )
           snapshot.dimension_detected(
-            dimension_uri:  'uri:dimension/7',
+            dimension_uri:  'uri:dimension/5',
             column_width:   1,
-            column_uris:    ['uri:dim/7/a', 'uri:dim/7/b']
+            column_uris:    ['uri:dim/5/a', 'uri:dim/5/b']
           )
           snapshot.dataset_completed
         end
 
         specify {
           expect(labels_for(snapshot.header_rows)).to be == [
-            [nil, nil, "Dataset 2", nil, nil],
-            [nil, nil, "Measure property 2", nil, nil],
-            [nil, nil, "Dimension 2a", nil, nil],
-            [nil, nil, "Dimension 3a", nil, nil],
-            ["Dataset 1", "Dimension 4a", "Dataset 3"],
-            ["Measure property 1", "Dimension 5a", "Measure property 3"],
-            ["Dimension 1a", "Dimension 1b", "Dimension 6a", "Dimension 6b", "Dimension 7a", "Dimension 7b"]
+            ["Dataset 1", "Dataset 2", "Dataset 3"],
+            ["Measure property 1", "Measure property 2", "Measure property 3"],
+            [nil, "Dimension 2a", nil],
+            [nil, "Dimension 3a", nil],
+            ["Dimension 1a", "Dimension 1b", "Dimension 4a", "Dimension 4b", "Dimension 5a", "Dimension 5b"]
           ]
         }
 
         specify {
           expect(widths_for(snapshot.header_rows)).to be == [
-            [1, 1, 2, 1, 1],
-            [1, 1, 2, 1, 1],
-            [1, 1, 2, 1, 1],
-            [1, 1, 2, 1, 1],
+            [2, 2, 2],
+            [2, 2, 2],
             [2, 2, 2],
             [2, 2, 2],
             [1, 1, 1, 1, 1, 1]
@@ -424,18 +391,18 @@ module DclgStatsSelector
 
         specify {
           expect(labels_for(snapshot.header_rows)).to be == [
-            [nil, nil, nil, "Dataset 3"],
-            ["Dataset 1", nil, nil, "Measure property 3"],
-            ["Measure property 1", "Dataset 2", "Dimension 4a"],
-            ["Dimension 1a", "Measure property 2", "Dimension 5a"],
+            ["Dataset 1", "Dataset 2", "Dataset 3"],
+            ["Measure property 1", "Measure property 2", "Measure property 3"],
+            [nil, nil, "Dimension 4a"],
+            ["Dimension 1a", nil, "Dimension 5a"],
             ["Dimension 2a", "Dimension 3a", "Dimension 3b", "Dimension 6a"]
           ]
         }
 
         specify {
           expect(widths_for(snapshot.header_rows)).to be == [
-            [ 1, 1, 1, 1 ],
-            [ 1, 1, 1, 1 ],
+            [ 1, 2, 1 ],
+            [ 1, 2, 1 ],
             [ 1, 2, 1 ],
             [ 1, 2, 1 ],
             [ 1, 1, 1, 1 ]
