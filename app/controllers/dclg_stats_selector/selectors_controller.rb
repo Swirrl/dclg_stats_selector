@@ -48,7 +48,7 @@ module DclgStatsSelector
 
     def show
       @selector = Selector.find(params[:id])
-      @snapshot = @selector.build_snapshot(row_limit: 20)
+      @snapshot = @selector.build_snapshot(row_limit: 7)
     end
 
     def download
