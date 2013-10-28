@@ -47,6 +47,14 @@ feature "Preparing a Stats Selector document" do
       page.should have_content 'Step 1 of 3: Upload GSS Codes'
       page.should have_content 'The uploaded file should contain GSS codes at either LSOA or Local Authority level.'
     end
+
+    scenario 'Visitor just clicks upload without selecting a .csv file' do
+      visit '/selectors/new'
+      click_on 'Upload'
+
+      page.should have_content 'Step 1 of 3: Upload GSS Codes'
+      page.should have_content 'Please select a valid .csv file'
+    end
   end
 
   describe 'Creating a new Selector' do

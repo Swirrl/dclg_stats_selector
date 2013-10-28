@@ -10,6 +10,8 @@ module DclgStatsSelector
     end
 
     def preview
+      (no_file_uploaded && return) unless params[:csv_upload].present?
+
       geography_service = GeographyService.new
 
       # The error handling used to live in the Selector, and I've preserved the
@@ -82,6 +84,11 @@ module DclgStatsSelector
 
     def too_many_gss_codes
       flash.now[:error] = 'The uploaded file contains more than 500 GSS codes, please reduce its size and try again.'
+      render :new
+    end
+
+    def no_file_uploaded
+      flash.now[:error] = 'Please select a valid .csv file'
       render :new
     end
   end
