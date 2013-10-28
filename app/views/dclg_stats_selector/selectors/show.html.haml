@@ -67,19 +67,21 @@
       = image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'
 
 :javascript
-  var spinner = $('#add-data-spinner').detach();
+  $(function() {
+    var spinner = $('#add-data-spinner').detach();
 
-  $('#add-data-modal').on('hidden.bs.modal', function() {
-    $(this).removeData();
-    $('#add-data-modal').empty();
-  });
+    $('#add-data-modal').on('hidden.bs.modal', function() {
+      $(this).removeData();
+      $('#add-data-modal').empty();
+    });
 
-  $('#add-data-modal').on('show.bs.modal', function() {
-    $('#add-data-modal').append(spinner);
-    console.log('show');
-  });
+    $('#add-data-modal').on('show.bs.modal', function() {
+      $('#add-data-modal').append(spinner);
+      //console.log('show');
+    });
 
-  $('#add-data-modal').on('pmd.modal.loaded', function() {
-    spinner.remove();
-    console.log('shown');
+    $('#add-data-modal').on('pmd.modal.loaded', function() {
+      spinner.remove();
+      //console.log('shown');
+    });
   });

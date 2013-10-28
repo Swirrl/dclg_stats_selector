@@ -241,6 +241,10 @@ div#filter-lists {
   }
 }
 
+.ie8 div#filter-lists div.dimension a {
+    color: $link-color !important;
+  }
+
 ul#dimensions > li {
   & > ul {
     @include clearfix();

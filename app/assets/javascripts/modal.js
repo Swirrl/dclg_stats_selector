@@ -222,7 +222,6 @@
 
   // MODAL DATA-API
   // ==============
-
   $(document).on('click.bs.modal.data-api', '[data-toggle="modal"]', function (e) {
     var $this   = $(this)
     var href    = $this.attr('href')
