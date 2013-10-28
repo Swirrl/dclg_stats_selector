@@ -20,8 +20,8 @@ section#stats-selector {
       margin-bottom: 3px;
 
       &#imported {
-        background-color: $info-color-background;   
-        color: $info-color-text; 
+        background-color: $info-color-background;
+        color: $info-color-text;
       }
       &#not-imported {
         background-color: $warning-color-background;
@@ -44,6 +44,9 @@ section#stats-selector {
   }
   &.step-three {
     .actions {
+      > a:first-child {
+        margin-right:4px;
+      }
       margin-top: 30px;
       text-align: center;
     }
@@ -227,7 +230,7 @@ div#filter-lists {
         margin: 0 3px 3px 0;
         padding: 3px 5px;
         border-radius: 3px;
-        
+
         &.dimension-label {
           background-color: inherit !important;
           padding: 3px 0;

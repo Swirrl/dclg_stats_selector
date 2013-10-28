@@ -22,8 +22,23 @@
             .error= flash[:error]
     .seven.columns.offset-by-one
       :markdown
-        ### Get started
-        Upload a .csv file containing up to 500 GSS codes…
+        ###What is this?
 
-        ### What's a GSS Code?
-        TBD
+        This **Statistics Selector** lets you choose data from across the range of DCLG datasets, selecting values for the geographical areas that interest you.
+
+        ###Get started
+
+        Upload a CSV or text file with a single GSS code on each line (for example by making a spreadsheet with a single column and saving it as Comma Separated Values).
+
+        The GSS code is the Office for National Statistics identifier for a geographical region. It consists of a letter followed by 8 digits. The tool currently works for English local authorities (with codes starting E06, E07, E08 or E09) or for English LSOAs (codes starting E01).
+
+        The file can have a maximum of 500 rows and should contain only local authorities or only LSOAs.
+
+        You can find the definitive list of codes on the ONS website ([Local Authorities](https://geoportal.statistics.gov.uk/Docs/Names%20and%20Codes/Local_authority_districts_\(UK\)_2012_Names_and_Codes.zip), [LSOAs](https://geoportal.statistics.gov.uk/Docs/Names%20and%20Codes/Lower_layer_super_output_areas_\(E+W\)_2001_Names_and_Codes.zip)).  There is also this useful summary on [Wikipedia](http://en.wikipedia.org/wiki/ONS_coding_system).
+
+        For example:
+
+            E08000025
+            E08000021
+            E09000014
+            E06000054
