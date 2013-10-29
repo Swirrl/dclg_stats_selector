@@ -1,24 +1,12 @@
-require 'uuidtools'
-
 module DclgStatsSelector
   class Fragment
-    attr_reader :id, :dataset_uri
+    include Mongoid::Document
 
-    def initialize(attributes)
-      @id                   = attributes.fetch(:id) { UUIDTools::UUID.random_create.to_s }
-      @dataset_uri          = attributes.fetch(:dataset_uri)
-      @measure_property_uri = attributes.fetch(:measure_property_uri)
-      @dimensions           = attributes.fetch(:dimensions)
-    end
+    field :dataset_uri
+    field :measure_property_uri
+    field :dimensions, type: Hash
 
-    def to_h
-      {
-        id:                   @id,
-        dataset_uri:          @dataset_uri,
-        measure_property_uri: @measure_property_uri,
-        dimensions:           @dimensions
-      }
-    end
+    embedded_in :selector
 
     # An opaque token that identifies fragments (relatively) uniquely
     # and is suitable for using in a CSS class name
@@ -28,21 +16,21 @@ module DclgStatsSelector
     # iterates the fragments to generate the footer - otherwise we could
     # pass a code in when building the snapshot)
     def fragment_code
-      @dataset_uri.hash
+      self.dataset_uri.hash
     end
 
     def inform_observation_source(observation_source)
       observation_source.dataset_detected(
-        dataset_uri:          @dataset_uri,
-        measure_property_uri: @measure_property_uri,
-        dimensions:           @dimensions
+        dataset_uri:          dataset_uri,
+        measure_property_uri: measure_property_uri,
+        dimensions:           dimensions
       )
     end
 
     def inform_snapshot(snapshot)
       snapshot.dataset_detected(
-        dataset_uri:          @dataset_uri,
-        measure_property_uri: @measure_property_uri
+        dataset_uri:          dataset_uri,
+        measure_property_uri: measure_property_uri
       )
 
       each_dimension_bottom_up_with_level do |(dimension_uri, values), level|
@@ -70,10 +58,6 @@ module DclgStatsSelector
       end
     end
 
-    def save
-      true
-    end
-
     # Only still public because of the show page
     def volume_of_selected_cube
       volume_at_level(bottom_level)
@@ -84,18 +68,18 @@ module DclgStatsSelector
     # Candidate for the prize for "most specific enumeration method"
     def each_dimension_bottom_up_with_level(&block)
       # Watch out as there's no spec for the use of reverse here
-      @dimensions.map.with_index.to_a.reverse.each(&block)
+      dimensions.map.with_index.to_a.reverse.each(&block)
     end
 
     def dimension_value_pairs
-      @dimensions.reduce([]) { |coords, (dimension_uri, dimension_values)|
+      dimensions.reduce([]) { |coords, (dimension_uri, dimension_values)|
         coords << dimension_values.map { |value| {dimension_uri => value} }
       }
     end
 
     def volume_at_level(level)
-      @dimensions.keys[0..level].reduce(1) { |volume, dimension|
-        volume * @dimensions[dimension].length
+      dimensions.keys[0..level].reduce(1) { |volume, dimension|
+        volume * dimensions[dimension].length
       }
     end
 
@@ -112,17 +96,17 @@ module DclgStatsSelector
     end
 
     def number_of_dimensions
-      @dimensions.length
+      dimensions.length
     end
 
     def labellable_resource_uris
       [
-        @dataset_uri,
-        @measure_property_uri
+        dataset_uri,
+        measure_property_uri
       ].concat(
-        @dimensions.keys
+        dimensions.keys
       ).concat(
-        @dimensions.values
+        dimensions.values
       ).flatten
     end
   end

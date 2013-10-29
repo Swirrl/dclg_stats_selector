@@ -1,8 +1,9 @@
 module DclgStatsSelector
   class SelectorsController < PublishMyData::ApplicationController
-    class InvalidCSVUploadError < StandardError; end
+    before_filter :get_selector, only: [ :edit, :finish, :show, :download, :destroy ]
+    before_filter :redirect_if_finished, only: [ :edit ]
+    before_filter :redirect_unless_finished, only: [ :show, :download ]
 
-    rescue_from InvalidCSVUploadError, with: :invalid_upload
     rescue_from GeographyService::TooManyGSSCodesError, with: :too_many_gss_codes
     rescue_from GeographyService::TooManyGSSCodeTypesError, with: :mixed_gss_codes
 
@@ -21,7 +22,7 @@ module DclgStatsSelector
         begin
           CSV.read(params[:csv_upload].path).map(&:first)
         rescue ArgumentError
-          raise InvalidCSVUploadError, "file upload does not contain .csv data"
+          (invalid_upload && return)
         end
 
       data = geography_service.uris_and_geography_type_for_gss_codes(gss_code_candidates)
@@ -45,17 +46,24 @@ module DclgStatsSelector
         row_uris:       gss_resource_uris
       )
 
+      redirect_to edit_selector_path(@selector)
+    end
+
+    def edit
+      @snapshot = @selector.build_snapshot(row_limit: 7)
+    end
+
+    def finish  
+      @selector.finish!
       redirect_to selector_path(@selector)
     end
 
     def show
-      @selector = Selector.find(params[:id])
       @snapshot = @selector.build_snapshot(row_limit: 7)
     end
 
     def download
-      selector = Selector.find(params[:id])
-      snapshot = selector.build_snapshot
+      snapshot = @selector.build_snapshot
       filename = "statistics"
       source_url = "[source link not currently stored]" # selector_url(selector)
       output_builder = CSVBuilder.build(
@@ -71,6 +79,10 @@ module DclgStatsSelector
     end
 
     private
+
+    def get_selector
+      @selector = Selector.find(params[:id])
+    end
 
     def invalid_upload
       flash.now[:error] = 'The uploaded file did not contain valid CSV data, please check and try again.'
@@ -90,6 +102,14 @@ module DclgStatsSelector
     def no_file_uploaded
       flash.now[:error] = 'Please select a valid .csv file'
       render :new
+    end
+
+    def redirect_if_finished
+      redirect_to selector_path(@selector) if @selector.finished
+    end
+
+    def redirect_unless_finished
+      redirect_to edit_selector_path(@selector) unless @selector.finished
     end
   end
 end

@@ -10,3 +10,4 @@ Gemfile.lock
 tmp/
 dclg_stats_selector.sublime-workspace
 .sass-cache
+.rspec

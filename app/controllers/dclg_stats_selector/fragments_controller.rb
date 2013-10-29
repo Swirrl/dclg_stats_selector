@@ -1,7 +1,8 @@
 module DclgStatsSelector
   class FragmentsController < PublishMyData::ApplicationController
-    before_filter :get_selector, only: [ :datasets, :new, :create, :destroy ]
     before_filter :get_dataset, only:  [ :new, :create ]
+    before_filter :get_selector, only: [ :datasets, :new, :create, :destroy ]
+    before_filter :get_fragment, only: [ :destroy ]
 
     def datasets
       @datasets = GeographyService.geographical_data_cubes(@selector.geography_type)
@@ -33,7 +34,7 @@ module DclgStatsSelector
       # restructure the code a lot to give it a proper home.
       measure_property_uri = ObservationSource.measure_property_uri(@dataset.uri)
 
-      @selector.build_fragment(
+      @selector.fragments.build(
         dataset_uri:          @dataset.uri.to_s,
         measure_property_uri: measure_property_uri,
         dimensions:           dimensions
@@ -45,7 +46,7 @@ module DclgStatsSelector
     end
 
     def destroy
-      @selector.remove_fragment(params[:id])
+      @selector.fragments.delete(@fragment)
 
       if @selector.save
         redirect_to selector_path(@selector)
@@ -54,12 +55,16 @@ module DclgStatsSelector
 
     private
 
+    def get_dataset
+      @dataset = PublishMyData::Dataset.find(params[:dataset_uri])
+    end
+
     def get_selector
       @selector = Selector.find(params[:selector_id])
     end
 
-    def get_dataset
-      @dataset = PublishMyData::Dataset.find(params[:dataset_uri])
+    def get_fragment
+      @fragment = @selector.fragments.find(params[:id])
     end
 
     # Converts {dimension_uri => csv_dimension_value_data} to {dimension_uri => [dim_value_1, ...]}

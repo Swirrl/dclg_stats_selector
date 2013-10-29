@@ -2,6 +2,8 @@ require 'spec_helper'
 
 module DclgStatsSelector
   describe SelectorsController do
+    let(:selector) { FactoryGirl.create(:selector) }
+
     describe "#preview" do
       context "given an uploaded text file containing GSS codes" do
         let(:csv_upload) {
@@ -10,7 +12,7 @@ module DclgStatsSelector
         }
 
         it "should respond successfully" do
-          post :preview, csv_upload: csv_upload, use_route: :publish_my_data
+          post :preview, csv_upload: csv_upload, use_route: :dclg_stats_selector
           response.should be_success
         end
       end
@@ -22,12 +24,12 @@ module DclgStatsSelector
         }
 
         it "should respond successfully" do
-          post :preview, csv_upload: invalid_upload, use_route: :publish_my_data
+          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
           response.should be_success
         end
 
         it "should flash an error message" do
-          post :preview, csv_upload: invalid_upload, use_route: :publish_my_data
+          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
           flash[:error].should_not be_nil
         end
       end
@@ -39,12 +41,12 @@ module DclgStatsSelector
         }
 
         it "should respond successfully" do
-          post :preview, csv_upload: invalid_upload, use_route: :publish_my_data
+          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
           response.should be_success
         end
 
         it "should flash an error message" do
-          post :preview, csv_upload: invalid_upload, use_route: :publish_my_data
+          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
           flash[:error].should_not be_nil
         end
       end
@@ -56,13 +58,60 @@ module DclgStatsSelector
         }
 
         it "should respond successfully" do
-          post :preview, csv_upload: large_upload, use_route: :publish_my_data
+          post :preview, csv_upload: large_upload, use_route: :dclg_stats_selector
           response.should be_success
         end
 
         it "should flash an error message" do
-          post :preview, csv_upload: large_upload, use_route: :publish_my_data
+          post :preview, csv_upload: large_upload, use_route: :dclg_stats_selector
           flash[:error].should_not be_nil
+        end
+      end
+    end
+
+    describe '#edit' do
+      it 'should respond successfully' do
+        get :edit, id: selector.to_param, use_route: :dclg_stats_selector
+        response.should be_success
+      end
+
+      context 'given a finished selector' do
+        before { selector.finish! }
+
+        it 'should redirect to show' do
+          get :edit, id: selector.to_param, use_route: :dclg_stats_selector
+          response.should redirect_to(selector)
+        end
+      end
+    end
+
+    describe '#show' do
+      it 'should redirect to edit' do
+        get :show, id: selector.to_param, use_route: :dclg_stats_selector
+        response.should redirect_to( [:edit, selector] )
+      end
+
+      context 'given a finished selector' do
+        before { selector.finish! }
+
+        it 'should respond successfully' do
+          response.should be_success
+        end
+      end
+    end
+
+    describe '#download' do
+      it 'should redirect to edit' do
+        get :download, id: selector.to_param, use_route: :dclg_stats_selector
+        response.should redirect_to( [:edit, selector] )
+      end
+
+      context 'given a finished selector' do
+        before { selector.finish! }
+
+        it 'should respond with valid csv' do
+          get :download, id: selector.to_param, use_route: :dclg_stats_selector
+          CSV.parse(response.body).should_not be_empty
         end
       end
     end

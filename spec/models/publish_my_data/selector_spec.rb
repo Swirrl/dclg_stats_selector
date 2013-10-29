@@ -4,16 +4,8 @@ require 'fileutils'
 
 module DclgStatsSelector
   describe Selector do
-    describe "#id" do
-      subject(:selector) { Selector.new(geography_type: 'unused') }
-
-      it "is a UUID" do
-        expect(selector.id).to be_a(UUIDTools::UUID)
-      end
-    end
-
     describe "#empty?" do
-      subject(:selector) { Selector.new(geography_type: 'unused') }
+      subject(:selector) { FactoryGirl.build(:selector) }
 
       context "new" do
         its(:empty?) { should be_true}
@@ -24,7 +16,7 @@ module DclgStatsSelector
           # Note that while the fragment has no dimensions, we still
           # consider the selector non-empty here, as we enforce through
           # the UI that fragments must have values for the dimensions
-          selector.build_fragment(
+          selector.fragments.build(
             dataset_uri:          'uri:dataset/1',
             measure_property_uri: 'uri:measure-property/1',
             dimensions: { }
@@ -32,48 +24,6 @@ module DclgStatsSelector
         end
 
         its(:empty?) { should be_false }
-      end
-    end
-
-    # See also the lint check above
-    describe "ActiveModel" do
-      describe "#to_key" do
-        let(:test_uuid) { UUIDTools::UUID.parse("5409ef37-1589-4cb5-a7fd-e8a1c7722a09") }
-
-        subject(:selector) {
-          Selector.new(geography_type: 'unused', id: test_uuid)
-        }
-
-        before(:each) do
-          selector.save # ActiveModel made me do it
-        end
-
-        its(:to_key) { should be == [ test_uuid ] }
-      end
-
-      describe "#to_param" do
-        subject(:selector) { Selector.new(geography_type: 'unused') }
-        let(:param) { selector.to_param }
-
-        before(:each) do
-          selector.save # ActiveModel made me do it
-        end
-
-        it "uses the id" do
-          expect(param).to be == selector.id.to_s
-        end
-
-        it "looks like a UUID" do
-          expect(param).to match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)
-        end
-      end
-
-      describe "#valid?" do
-        subject(:selector) { Selector.new(geography_type: 'unused') }
-
-        it "is always true (nothing we do yet can cause an error)" do
-          expect(selector).to be_valid
-        end
       end
     end
 
@@ -106,7 +56,7 @@ module DclgStatsSelector
       }
 
       before(:each) do
-        selector.build_fragment(
+        selector.fragments.build(
           dataset_uri:          'uri:dataset/1',
           measure_property_uri: 'uri:measure-property/1',
           dimensions: {
@@ -114,7 +64,7 @@ module DclgStatsSelector
             'uri:dimension/2' => ['uri:dimension/2/val/1', 'uri:dimension/2/val/2']
           }
         )
-        selector.build_fragment(
+        selector.fragments.build(
           dataset_uri:          'uri:dataset/2',
           measure_property_uri: 'uri:measure-property/2',
           dimensions: {
@@ -225,18 +175,17 @@ module DclgStatsSelector
       end
     end
 
-    describe '#remove_fragment' do
-      subject(:selector) { Selector.new(geography_type: 'unused') }
+    describe '#finish!' do
+      subject(:selector) { FactoryGirl.build(:selector) }
 
-      let!(:fragment) {
-        selector.build_fragment(
-          dataset_uri: 'uri:unused', measure_property_uri: 'uri:unused', dimensions: {}
-        )
-      }
+      it 'should set finished to true' do
+        selector.finish!
+        selector.finished.should be_true
+      end
 
-      it 'should remove the fragment with the given identifier' do
-        selector.remove_fragment(fragment.id)
-        selector.fragments.should_not include(fragment)
+      it 'should persist its finished status' do
+        selector.finish!
+        Selector.find(selector.id).finished.should be_true
       end
     end
   end

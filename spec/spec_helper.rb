@@ -29,6 +29,7 @@ RSpec.configure do |config|
 
   config.include(Term::ANSIColor)
   config.include(RDFHelpers)
+  config.include(Rails.application.routes.url_helpers)
 
   config.before(:each) do
     # delete from all graphs.

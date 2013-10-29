@@ -5,11 +5,7 @@ require 'spec_helper'
 include DclgStatsSelector
 
 feature "Preparing a Stats Selector document" do
-  let(:selector) { Selector.create(
-    id: '12345678-abcd-efab-1234-5678abcdefab',
-    geography_type: 'http://opendatacommunities.org/def/local-government/LocalAuthority',
-    row_uris: ['http://statistics.data.gov.uk/id/statistical-geography/E07000008', 'http://statistics.data.gov.uk/id/statistical-geography/E07000036']
-  ) }
+  let(:selector) { FactoryGirl.create(:selector) }
   let(:dataset)  { FactoryGirl.create(:dataset) }
 
   describe "Previewing data for a selector" do
@@ -22,7 +18,7 @@ feature "Preparing a Stats Selector document" do
       attach_file 'csv_upload', File.expand_path('spec/support/gss_etc.csv')
       click_on 'Upload'
 
-      page.should have_content 'Step 2 of 3: Review the data'
+      page.should have_content 'Step 2 of 4: Review the data'
       page.should have_content '2 GSS codes imported'
       page.should have_content '3 rows not imported'
       find('#non-imported-data').should have_content 'Ham'
@@ -35,7 +31,7 @@ feature "Preparing a Stats Selector document" do
       attach_file 'csv_upload', File.expand_path('spec/support/dog.gif')
       click_on 'Upload'
 
-      page.should have_content 'Step 1 of 3: Upload GSS Codes'
+      page.should have_content 'Step 1 of 4: Upload GSS Codes'
       page.should have_content 'The uploaded file did not contain valid CSV data'
     end
 
@@ -44,7 +40,7 @@ feature "Preparing a Stats Selector document" do
       attach_file 'csv_upload', File.expand_path('spec/support/gss_mixed.csv')
       click_on 'Upload'
 
-      page.should have_content 'Step 1 of 3: Upload GSS Codes'
+      page.should have_content 'Step 1 of 4: Upload GSS Codes'
       page.should have_content 'The uploaded file should contain GSS codes at either LSOA or Local Authority level.'
     end
 
@@ -52,7 +48,7 @@ feature "Preparing a Stats Selector document" do
       visit '/selectors/new'
       click_on 'Upload'
 
-      page.should have_content 'Step 1 of 3: Upload GSS Codes'
+      page.should have_content 'Step 1 of 4: Upload GSS Codes'
       page.should have_content 'Please select a valid .csv file'
     end
   end
@@ -69,9 +65,11 @@ feature "Preparing a Stats Selector document" do
     scenario 'Accepting the preview and creating a selector' do
       click_on 'Proceed to next step'
 
-      page.should have_content 'Step 3 of 3: Add column data'
+      page.should have_content 'Step 3 of 4: Add column data'
       page.should have_content 'E07000008 Cambridge'
       page.should have_content 'E07000036 Erewash'
+
+      page.should_not have_content 'Download'
     end
   end
 
@@ -154,7 +152,7 @@ feature "Preparing a Stats Selector document" do
       scenario 'Visitor completes the fragment creation process' do
         click_on 'Add 1 column of data'
 
-        page.should have_content 'Step 3 of 3: Add column data'
+        page.should have_content 'Step 3 of 4: Add column data'
         page.should have_content '2013 Q1'
         page.should have_content 'Mixed'
         # page.should have_content '234'
@@ -170,7 +168,7 @@ feature "Preparing a Stats Selector document" do
       scenario 'Visitor completes the fragment creation process' do
         click_on 'Add 3 columns of data'
 
-        page.should have_content 'Step 3 of 3: Add column data'
+        page.should have_content 'Step 3 of 4: Add column data'
         page.should have_content 'White'
         page.should have_content 'Mixed'
         page.should have_content 'Black' # all values for unfiltered dimension are present
@@ -184,15 +182,14 @@ feature "Preparing a Stats Selector document" do
       GeographyTasks.create_relevant_vocabularies
       GeographyTasks.populate_dataset_with_geographical_observations(dataset)
 
-      selector.build_fragment(
-        dataset_uri: dataset.uri,
+      selector.fragments.create(
+        dataset_uri: dataset.uri.to_s,
         dimensions: {
           'http://opendatacommunities.org/def/ontology/time/refPeriod' => ['http://reference.data.gov.uk/id/quarter/2013-Q1'],
           'http://opendatacommunities.org/def/ontology/homelessness/homelessness-acceptances/ethnicity' => ['http://opendatacommunities.org/def/concept/general-concepts/ethnicity/mixed']
         },
         measure_property_uri: 'http://opendatacommunities.org/def/ontology/homelessness/homelessness-acceptances/homelessnessAcceptancesObs'
       )
-      selector.save
 
       visit "/selectors/#{selector.id}"
     end
@@ -201,6 +198,32 @@ feature "Preparing a Stats Selector document" do
       find('th.fragment-actions').hover
       click_link 'Remove Data'
       page.should_not have_content '2013 Q1'
+    end
+  end
+
+  describe 'Finishing off a selector' do
+    background do
+      GeographyTasks.create_some_gss_resources
+      GeographyTasks.create_relevant_vocabularies
+      GeographyTasks.populate_dataset_with_geographical_observations(dataset)
+
+      selector.fragments.create(
+        dataset_uri: dataset.uri.to_s,
+        dimensions: {
+          'http://opendatacommunities.org/def/ontology/time/refPeriod' => ['http://reference.data.gov.uk/id/quarter/2013-Q1'],
+          'http://opendatacommunities.org/def/ontology/homelessness/homelessness-acceptances/ethnicity' => ['http://opendatacommunities.org/def/concept/general-concepts/ethnicity/mixed']
+        },
+        measure_property_uri: 'http://opendatacommunities.org/def/ontology/homelessness/homelessness-acceptances/homelessnessAcceptancesObs'
+      )
+
+      visit "/selectors/#{selector.id}"
+    end
+
+    scenario 'Visitor finishes the selector' do
+      visit "/selectors/#{selector.id}"
+      click_on 'Done'
+
+      page.should have_content 'Step 4 of 4: Download Data'
     end
   end
 end

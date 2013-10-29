@@ -1,32 +1,16 @@
-require 'uuidtools'
-require 'set'
-
 module DclgStatsSelector
   class Selector
-    include Persistence::ActiveModelInterface
+    include Mongoid::Document
+    # include Persistence::ActiveModelInterface
 
-    attr_accessor :geography_type
-    attr_reader   :fragments
+    field :finished, type: Boolean, default: false
+    field :row_uris, type: Array, default: []
+    field :geography_type
 
-    def initialize(attributes = {})
-      @id             = attributes.fetch(:id) { UUIDTools::UUID.random_create }
-      @geography_type = attributes.fetch(:geography_type)
-      @row_uris       = attributes.fetch(:row_uris) { [] }
-
-      @fragments = [ ]
-    end
+    embeds_many :fragments, class_name: 'DclgStatsSelector::Fragment'
 
     def empty?
-      @fragments.empty?
-    end
-
-    def to_h
-      {
-        id:             @id,
-        fragments:      @fragments.map { |fragment| fragment.to_h },
-        geography_type: @geography_type,
-        row_uris:       @row_uris
-      }
+      fragments.empty?
     end
 
     # Convenience method to take a snapshot with all necessary dependencies.
@@ -55,7 +39,7 @@ module DclgStatsSelector
         labeller.resource_detected(row_uri)
       end
 
-      @fragments.each do |fragment|
+      fragments.each do |fragment|
         fragment.inform_observation_source(observation_source)
         fragment.inform_snapshot(snapshot)
         fragment.inform_labeller(labeller)
@@ -64,21 +48,16 @@ module DclgStatsSelector
       nil
     end
 
-    def build_fragment(fragment_description)
-      fragment = Fragment.new(fragment_description)
-      @fragments << fragment
-      fragment
-    end
-
-    def remove_fragment(fragment_id)
-      @fragments.reject! { |fragment| fragment.id == fragment_id }
+    def finish!
+      self.finished = true
+      self.save
     end
 
     private
 
     def rows_uris_for_snapshot(options)
       row_limit = options.fetch(:row_limit, 0) - 1
-      @row_uris[0..row_limit]
+      row_uris[0..row_limit]
     end
   end
 end

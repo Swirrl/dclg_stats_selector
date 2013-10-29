@@ -10,7 +10,7 @@ $(function() {
     e.preventDefault();
   });
 
-  $('#stats-selector thead th, #stats-selector tbody td, #stats-selector tfoot th').hover(function() {
+  $('#preview thead th, #preview tbody td, #preview tfoot th').hover(function() {
     var fragmentClass = $(this).attr('class').split(' ')[0], // our custom fragment class is always the first..
         fragmentElements = $('.'+fragmentClass);
     fragmentElements.addClass('highlight');
