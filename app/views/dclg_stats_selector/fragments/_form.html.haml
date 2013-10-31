@@ -34,7 +34,7 @@
       %ul#dimensions
         - @dimensions.each do |dimension|
           %li.dimension
-            = hidden_field_tag "dataset_dimensions[#{dimension.uri}]", ''
+            = hidden_field_tag "dataset_dimensions[#{dimension.uri}]", '', class: 'selected-values'
             = hidden_field_tag "all_dataset_dimensions[#{dimension.uri}]", dimension.values.map{|v| v[:uri]}.join(', ')
             %h3
               = dimension.label
@@ -52,7 +52,7 @@
 :javascript
   var addValueWithAnchor = function(anchor) {
     var uri = anchor.attr('data-uri'),
-        input = anchor.parents('li.dimension').find('input'),
+        input = anchor.parents('li.dimension').find('input.selected-values'),
         dimensionValues;
 
     if (input.val().length == 0) {
@@ -65,7 +65,7 @@
   },
   removeValueWithAnchor = function(anchor) {
     var uri = anchor.attr('data-uri'),
-        input = anchor.parents('li.dimension').find('input'),
+        input = anchor.parents('li.dimension').find('input.selected-values'),
         dimensionValues = input.val().split(', '),
         idx;
 
