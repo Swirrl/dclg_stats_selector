@@ -31,6 +31,8 @@ module DclgStatsSelector
       @non_gss_codes      = data.fetch(:non_gss_codes)
       @geography_type     = data.fetch(:geography_type)
 
+      @gss_resource_uris.sort {|a, b| gss_code_candidates.index(a) <=> gss_code_candidates.index(b)}
+
       @gss_resource_uri_data = @gss_resource_uris.join(', ')
 
       respond_to do |format|
