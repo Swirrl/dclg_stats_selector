@@ -176,7 +176,7 @@ module DclgStatsSelector
     end
 
     describe '#finish!' do
-      subject(:selector) { FactoryGirl.build(:selector) }
+      let(:selector) { FactoryGirl.build(:selector) }
 
       it 'should set finished to true' do
         selector.finish!
@@ -186,6 +186,32 @@ module DclgStatsSelector
       it 'should persist its finished status' do
         selector.finish!
         Selector.find(selector.id).finished.should be_true
+      end
+    end
+
+    describe '#deep_copy' do
+      let(:fragment) { FactoryGirl.build(:fragment) }
+      let(:selector) { FactoryGirl.build(:selector, fragments: [ fragment ]) }
+      let(:new_selector) { selector.deep_copy }
+
+      it 'should have the same geography_type' do
+        new_selector.geography_type.should == selector.geography_type
+      end
+
+      it 'should have the same row uris' do
+        new_selector.row_uris.should == selector.row_uris
+      end
+
+      it 'should deep copy the fragments' do
+        new_selector.fragments.first.dataset_uri.should == selector.fragments.first.dataset_uri
+      end
+
+      context 'given a selector which is marked as finished' do
+        before { selector.finish! }
+        
+        it 'should not be marked as finished' do
+          new_selector.finished.should be_false
+        end
       end
     end
   end

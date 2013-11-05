@@ -3,6 +3,7 @@ DclgStatsSelector::Engine.routes.draw do
     post :preview, on: :collection
     get :finish, on: :member
     get :download, on: :member
+    put :duplicate, on: :member
     resources :fragments, except: [:show, :index] do
       get :datasets, on: :collection
     end

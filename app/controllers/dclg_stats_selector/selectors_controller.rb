@@ -1,6 +1,6 @@
 module DclgStatsSelector
   class SelectorsController < PublishMyData::ApplicationController
-    before_filter :get_selector, only: [ :edit, :finish, :show, :download, :destroy ]
+    before_filter :get_selector, only: [ :edit, :finish, :show, :download, :duplicate, :destroy ]
     before_filter :redirect_if_finished, only: [ :edit ]
     before_filter :redirect_unless_finished, only: [ :show, :download ]
 
@@ -60,6 +60,12 @@ module DclgStatsSelector
 
     def show
       @snapshot = @selector.build_snapshot(row_limit: 7)
+    end
+
+    def duplicate
+      @selector = @selector.deep_copy
+      @selector.save
+      redirect_to @selector
     end
 
     def download

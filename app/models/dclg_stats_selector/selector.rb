@@ -53,6 +53,13 @@ module DclgStatsSelector
       self.save
     end
 
+    def deep_copy
+      Selector.new(self.attributes.merge({
+        finished: false,
+        fragments: self.fragments.map(&:deep_copy)
+      }))
+    end
+
     private
 
     def rows_uris_for_snapshot(options)

@@ -44,8 +44,12 @@ section#stats-selector {
   }
   &.step-three, &.step-four {
     .actions {
-      > a:first-child {
+      > a {
         margin-right:4px;
+
+        &:last-child {
+          margin-right: 0;
+        }
       }
       margin-top: 30px;
       text-align: center;

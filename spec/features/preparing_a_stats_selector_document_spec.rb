@@ -135,9 +135,6 @@ feature "Preparing a Stats Selector document" do
       GeographyTasks.populate_dataset_with_geographical_observations(dataset)
 
       visit "/selectors/#{selector.id}"
-      # Commenting this out so it isn't generated when we run unrelated tests
-      # (I don't know if this is supposed to still be here or not - Ash)
-      # page.save_screenshot('wtf.png')
       find('.btn-add-data').trigger(:click)
       select dataset.title, from: 'dataset_uri'
       click_on 'Select Dataset'
@@ -202,28 +199,40 @@ feature "Preparing a Stats Selector document" do
   end
 
   describe 'Finishing off a selector' do
-    background do
-      GeographyTasks.create_some_gss_resources
-      GeographyTasks.create_relevant_vocabularies
-      GeographyTasks.populate_dataset_with_geographical_observations(dataset)
-
-      selector.fragments.create(
-        dataset_uri: dataset.uri.to_s,
-        dimensions: {
-          'http://opendatacommunities.org/def/ontology/time/refPeriod' => ['http://reference.data.gov.uk/id/quarter/2013-Q1'],
-          'http://opendatacommunities.org/def/ontology/homelessness/homelessness-acceptances/ethnicity' => ['http://opendatacommunities.org/def/concept/general-concepts/ethnicity/mixed']
-        },
-        measure_property_uri: 'http://opendatacommunities.org/def/ontology/homelessness/homelessness-acceptances/homelessnessAcceptancesObs'
-      )
-
-      visit "/selectors/#{selector.id}"
-    end
-
     scenario 'Visitor finishes the selector' do
       visit "/selectors/#{selector.id}"
       click_on 'Done'
 
       page.should have_content 'Step 4 of 4: Download Data'
+    end
+  end
+
+  describe 'Duplicating a selector', js: true do
+    background do
+      GeographyTasks.create_some_gss_resources
+      GeographyTasks.create_relevant_vocabularies
+      GeographyTasks.populate_dataset_with_geographical_observations(dataset)
+
+      visit "/selectors/#{selector.id}"
+      find('.btn-add-data').trigger(:click)
+      select dataset.title, from: 'dataset_uri'
+      click_on 'Select Dataset'
+      click_on '2013 Q1'
+      click_on 'Mixed'
+      click_on 'Add 1 column of data'
+    end
+
+    scenario 'Visitor duplicates the selector' do
+      old_edit_path = current_path
+      find_link('Done').trigger(:click)
+      find_link('Edit').trigger(:click)
+      page.should have_content 'Step 3 of 4: Add column data'
+      page.should have_content 'E07000008 Cambridge'
+      page.should have_content 'E07000036 Erewash'
+      page.should have_content '2013 Q1'
+      page.should have_content 'Mixed'
+
+      current_path.should_not == old_edit_path
     end
   end
 end

@@ -220,6 +220,22 @@ module DclgStatsSelector
           end
         end
       end
+
+      describe '#deep_copy' do
+        let(:new_fragment) { fragment.deep_copy }
+
+        it 'should copy the dataset_uri' do
+          new_fragment.dataset_uri.should == fragment.dataset_uri
+        end
+
+        it 'should copy the measure_property_uri' do
+          new_fragment.measure_property_uri.should == fragment.measure_property_uri
+        end
+
+        it 'should copy the dimensions' do
+          new_fragment.dimensions.should == fragment.dimensions
+        end
+      end
     end
   end
 end

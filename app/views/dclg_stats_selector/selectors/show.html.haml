@@ -20,6 +20,9 @@
             %tr
               %td &hellip;
       .actions
-        = link_to download_selector_path(@selector), class: 'btn primary' do
+        = link_to download_selector_path(@selector), class: 'btn primary', id: 'download-selector' do
           %i.icon-download
           Download
+        = link_to duplicate_selector_path(@selector), method: :put, class: 'btn secondary', id: 'duplicate-selector' do
+          %i.icon-pencil
+          Edit

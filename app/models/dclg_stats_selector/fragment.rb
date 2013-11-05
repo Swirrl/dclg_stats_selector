@@ -19,6 +19,10 @@ module DclgStatsSelector
       self.dataset_uri.hash
     end
 
+    def deep_copy
+      Fragment.new(self.attributes)
+    end
+
     def inform_observation_source(observation_source)
       observation_source.dataset_detected(
         dataset_uri:          dataset_uri,
