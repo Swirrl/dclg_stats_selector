@@ -19,6 +19,8 @@
           %tfoot
             %tr
               %td &hellip;
+              - if @snapshot.has_secondary_row_uris?
+                %td
               - @selector.fragments.each do |fragment|
                 %th.fragment-actions{ colspan: fragment.volume_of_selected_cube, class: dom_class_for_fragment(fragment) }
                   = link_to selector_fragment_path(@selector, id: fragment.id), method: :delete, class: 'btn btn-remove-data', style: 'display: none;' do
