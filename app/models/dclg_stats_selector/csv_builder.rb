@@ -52,7 +52,7 @@ module DclgStatsSelector
         row_description.fetch(:row_label),
         *row_description.fetch(:values)
       ]
-      if row_description.has_key?(:secondary_row_uri)
+      if row_description[:secondary_row_uri]
         row_values = [row_description.fetch(:secondary_row_uri), row_description.fetch(:secondary_row_label)] + row_values
       end
       @csv << row_values
