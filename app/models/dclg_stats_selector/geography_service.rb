@@ -18,6 +18,13 @@ module DclgStatsSelector
       non_gss_codes = uri_candidates - gss_codes
       raise TooManyGSSCodeTypesError unless (geography_types.size == 1)
 
+      # sort based on order of original candidates
+      gss_resource_uris.sort! do |a,b|
+        a_index, b_index = gss_resource_uris.index(a), gss_resource_uris.index(b)
+        gss_a, gss_b = gss_codes[a_index], gss_codes[b_index]
+        uri_candidates.index(gss_a) <=> uri_candidates.index(gss_b)
+      end
+
       {
         gss_resource_uris:  gss_resource_uris,
         non_gss_codes:      non_gss_codes,

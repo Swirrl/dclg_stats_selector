@@ -26,6 +26,11 @@ module DclgStatsSelector
           )
         end
 
+        it "returns the URIs of the resources in the same order as their GSS codes were given" do
+          result.fetch(:gss_resource_uris).first.should == 'http://statistics.data.gov.uk/id/statistical-geography/E07000036'
+          result.fetch(:gss_resource_uris).last.should == 'http://statistics.data.gov.uk/id/statistical-geography/E07000008'
+        end
+
         it "returns the non-matching GSS codes" do
           expect(result.fetch(:non_gss_codes)).to match_array(%w[ Beans Eggs ])
         end
