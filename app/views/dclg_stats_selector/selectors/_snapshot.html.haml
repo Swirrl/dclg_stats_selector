@@ -9,6 +9,8 @@
   - snapshot.header_rows.drop(1).each do |header_row|
     %tr
       %td
+      - if snapshot.has_secondary_row_uris?
+        %td
       - header_row.each do |header_column|
         - if header_column.type == :blank
           %th{ colspan: header_column.width, class: dom_class_for_fragment(header_column) }
@@ -17,6 +19,8 @@
 %tbody
   - snapshot.table_rows.each.with_index do |row, index|
     %tr
+      - if snapshot.has_secondary_row_uris?
+        %th.secondary= row.secondary_label
       %th= row.label
       - row.each do |cell|
         %td{ class: dom_class_for_fragment(cell) }= cell

@@ -18,20 +18,31 @@ module DclgStatsSelector
       # The error handling used to live in the Selector, and I've preserved the
       # use of rescue_from for now, hence catching and raising an error within
       # the controller
-      gss_code_candidates =
+      uri_candidates =
         begin
           CSV.read(params[:csv_upload].path).map(&:first)
         rescue ArgumentError
           (invalid_upload && return)
         end
 
-      data = geography_service.uris_and_geography_type_for_gss_codes(gss_code_candidates)
+      if params[:postcode]
+        data = geography_service.uris_for_postcodes(uri_candidates)
 
-      @gss_resource_uris  = data.fetch(:gss_resource_uris)
-      @non_gss_codes      = data.fetch(:non_gss_codes)
-      @geography_type     = data.fetch(:geography_type)
+        @gss_resource_uris        = data.fetch(:gss_resource_uris)
+        @secondary_resource_uris  = data.fetch(:secondary_resource_uris)
+        @non_gss_codes            = data.fetch(:non_gss_codes)
+        @geography_type           = 'http://opendatacommunities.org/def/geography#LSOA'
 
-      @gss_resource_uris.sort {|a, b| gss_code_candidates.index(a) <=> gss_code_candidates.index(b)}
+        @secondary_resource_uri_data = @secondary_resource_uris.join(', ')
+      else
+        data = geography_service.uris_and_geography_type_for_gss_codes(uri_candidates)
+
+        @gss_resource_uris  = data.fetch(:gss_resource_uris)
+        @non_gss_codes      = data.fetch(:non_gss_codes)
+        @geography_type     = data.fetch(:geography_type)
+      end
+
+      # @gss_resource_uris.sort {|a, b| uri_candidates.index(a) <=> uri_candidates.index(b)}
 
       @gss_resource_uri_data = @gss_resource_uris.join(', ')
 
@@ -42,10 +53,15 @@ module DclgStatsSelector
 
     def create
       gss_resource_uris = params[:gss_resource_uri_data].split(', ')
+      secondary_resource_uris = nil
+      if params[:secondary_resource_uri_data]
+        secondary_resource_uris = params[:secondary_resource_uri_data].split(', ')
+      end
 
       @selector = Selector.create(
-        geography_type: params[:geography_type],
-        row_uris:       gss_resource_uris
+        geography_type:       params[:geography_type],
+        row_uris:             gss_resource_uris,
+        secondary_row_uris:   secondary_resource_uris
       )
 
       redirect_to edit_selector_path(@selector)

@@ -126,7 +126,7 @@ module DclgStatsSelector
 
           it "informs the snapshot of the rows" do
             expect(snapshot).to have_received(:row_uris_detected).with(
-              ['uri:row/1', 'uri:row/2', 'uri:row/3']
+              ['uri:row/1', 'uri:row/2', 'uri:row/3'], nil
             )
           end
         end
@@ -168,7 +168,7 @@ module DclgStatsSelector
         describe "priming the snapshot" do
           it "informs the snapshot of the rows" do
             expect(snapshot).to have_received(:row_uris_detected).with(
-              ['uri:row/1', 'uri:row/2']
+              ['uri:row/1', 'uri:row/2'], nil
             )
           end
         end

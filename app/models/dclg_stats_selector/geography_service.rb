@@ -8,17 +8,31 @@ module DclgStatsSelector
     cattr_accessor :MAX_NUMBER_OF_GSS_CODES
     @@MAX_NUMBER_OF_GSS_CODES = 500
 
-    def uris_and_geography_type_for_gss_codes(gss_code_candidates)
-      gss_codes, gss_resource_uris, geography_types = gss_codes_and_uris(gss_code_candidates)
+    cattr_accessor :POSTCODE_RESOURCE_TYPE
+    @@POSTCODE_RESOURCE_TYPE = 'http://data.ordnancesurvey.co.uk/ontology/postcode/PostcodeUnit'
+
+    def uris_and_geography_type_for_gss_codes(uri_candidates)
+      gss_codes, gss_resource_uris, geography_types = gss_codes_and_uris(uri_candidates)
       raise TooManyGSSCodesError if gss_codes.size > self.class.MAX_NUMBER_OF_GSS_CODES
 
-      non_gss_codes = gss_code_candidates - gss_codes
+      non_gss_codes = uri_candidates - gss_codes
       raise TooManyGSSCodeTypesError unless (geography_types.size == 1)
 
       {
         gss_resource_uris:  gss_resource_uris,
         non_gss_codes:      non_gss_codes,
         geography_type:     geography_types.first
+      }
+    end
+
+    def uris_for_postcodes(uri_candidates)
+      postcodes, postcode_uris, lsoa_uris = postcodes_and_uris(uri_candidates)
+      non_postcodes = uri_candidates - postcodes
+
+      {
+        gss_resource_uris:        lsoa_uris,
+        non_gss_codes:            non_postcodes,
+        secondary_resource_uris:  postcode_uris
       }
     end
 
@@ -71,6 +85,28 @@ module DclgStatsSelector
       }.tap { |results|
         results[2] = results[2].to_a
       }
+    end
+
+    def postcodes_and_uris(postcodes)
+      postcodes.reduce([[], [], []]) do |(postcodes, uris, lsoa_uris), postcode|
+        uri = "http://data.ordnancesurvey.co.uk/id/postcodeunit/#{postcode.gsub(/\s+/, '').upcase}"
+        query = <<-SPARQL
+          ASK {<#{uri}> a <#{GeographyService.POSTCODE_RESOURCE_TYPE}>}
+        SPARQL
+        query_response = Tripod::SparqlClient::Query.query(query, "application/sparql-results+json")
+        if JSON.parse(query_response)["boolean"]
+          postcodes << postcode
+          uris << uri
+
+          lsoa_query = <<-SPARQL
+            SELECT ?lsoa
+            WHERE { <#{uri}> <http://opendatacommunities.org/def/geography#lsoa> ?lsoa }
+          SPARQL
+          Rails.logger.debug(Tripod::SparqlClient::Query.select(lsoa_query))
+          lsoa_uris << Tripod::SparqlClient::Query.select(lsoa_query).first['lsoa']['value']
+        end
+        [postcodes, uris, lsoa_uris]
+      end
     end
   end
 end

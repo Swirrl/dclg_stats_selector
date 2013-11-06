@@ -9,17 +9,36 @@
   .row.container
     .sixteen.columns
       %h3 Statistics Selector
-      %h1 Step 1 of 4: Upload GSS Codes
+      %h1 Step 1 of 4: Upload geographical data
   .row.container
     .eight.columns
-      = form_tag preview_selectors_path, multipart: true do
-        %fieldset
-          %legend Select a .csv file
-          = file_field_tag :csv_upload
-          .submit.primary
-            = submit_tag 'Upload'
-          - if flash[:error]
-            .error= flash[:error]
+      %h4 Please select from one of the following options:
+      #upload-data.panel-group
+        .panel.panel-default
+          .panel-heading
+            %h4.panel-title
+              %a(data-toggle="collapse" data-parent="#upload-data" href="#upload-gss") Upload GSS Codes
+          #upload-gss.collapse.panel-collapse
+            .panel-body
+              = form_tag preview_selectors_path, multipart: true do
+                = file_field_tag :csv_upload
+                .submit.primary
+                  = submit_tag 'Upload'
+        .panel.panel-default
+          .panel-heading
+            %h4.panel-title
+              %a(data-toggle="collapse" data-parent="#upload-data" href="#upload-postcodes") Upload UK Postcodes
+          #upload-postcodes.collapse.panel-collapse
+            .panel-body
+              = form_tag preview_selectors_path(postcode: true), multipart: true do          
+                = file_field_tag :csv_upload
+                .help 
+                  Postcodes will be matched against
+                  %a(href="/data/lower-layer-super-output-areas" target="_blank") LSOA
+                .submit.primary
+                  = submit_tag 'Upload'
+      - if flash[:error]
+        .error= flash[:error]
     .seven.columns.offset-by-one
       :markdown
         ###What is this?

@@ -39,18 +39,23 @@ module DclgStatsSelector
       @csv << []
     end
 
-    def header_row(row)
-      @csv << ["", ""] + row.inject([]) { |csv_row, cell|
+    def header_row(row, has_secondary_row_headings=false)
+      padding = has_secondary_row_headings ? ['','','',''] : ['','']
+      @csv << padding + row.inject([]) { |csv_row, cell|
         csv_row.concat(text_cells(cell))
       }
     end
 
     def table_row(row_description)
-      @csv << [
+      row_values = [
         row_description.fetch(:row_uri),
         row_description.fetch(:row_label),
         *row_description.fetch(:values)
       ]
+      if row_description.has_key?(:secondary_row_uri)
+        row_values = [row_description.fetch(:secondary_row_uri), row_description.fetch(:secondary_row_label)] + row_values
+      end
+      @csv << row_values
     end
 
     def to_csv

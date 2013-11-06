@@ -1,4 +1,5 @@
 //= require modal
+//= require collapse
 
 $(function() {
   $('#reveal-non-imported-data').click(function(e) {

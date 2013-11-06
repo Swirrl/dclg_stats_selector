@@ -5,6 +5,7 @@ module DclgStatsSelector
 
     field :finished, type: Boolean, default: false
     field :row_uris, type: Array, default: []
+    field :secondary_row_uris, type: Array
     field :geography_type
 
     embeds_many :fragments, class_name: 'DclgStatsSelector::Fragment'
@@ -27,16 +28,25 @@ module DclgStatsSelector
     end
 
     def take_snapshot(snapshot, observation_source, labeller, options = {})
-      row_uris = rows_uris_for_snapshot(options)
+      rows = uris_for_snapshot(row_uris, options)
+      secondary_rows = nil
+      if secondary_row_uris
+        secondary_rows = uris_for_snapshot(secondary_row_uris, options)
+      end
 
       observation_source.row_uris_detected(
         # The current version of the Stats Selector hard-codes this
         'http://opendatacommunities.org/def/ontology/geography/refArea',
-        row_uris
+        rows
       )
-      snapshot.row_uris_detected(row_uris)
-      row_uris.each do |row_uri|
+      snapshot.row_uris_detected(rows, secondary_rows)
+      rows.each do |row_uri|
         labeller.resource_detected(row_uri)
+      end
+      if secondary_rows
+        secondary_rows.each do |row_uri|
+          labeller.resource_detected(row_uri)
+        end
       end
 
       fragments.each do |fragment|
@@ -62,9 +72,9 @@ module DclgStatsSelector
 
     private
 
-    def rows_uris_for_snapshot(options)
+    def uris_for_snapshot(uris, options)
       row_limit = options.fetch(:row_limit, 0) - 1
-      row_uris[0..row_limit]
+      uris[0..row_limit]
     end
   end
 end

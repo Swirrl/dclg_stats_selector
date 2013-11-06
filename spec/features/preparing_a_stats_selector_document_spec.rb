@@ -8,68 +8,146 @@ feature "Preparing a Stats Selector document" do
   let(:selector) { FactoryGirl.create(:selector) }
   let(:dataset)  { FactoryGirl.create(:dataset) }
 
-  describe "Previewing data for a selector" do
+  context 'based on GSS codes' do
     background do
       GeographyTasks.create_some_gss_resources
+
+      visit '/selectors/new'
+      click_on 'Upload GSS Codes'
     end
 
-    scenario 'Visitor uploads a file containing a mix of GSS codes and other text' do
-      visit '/selectors/new'
-      attach_file 'csv_upload', File.expand_path('spec/support/gss_etc.csv')
-      click_on 'Upload'
+    describe "Previewing data for a selector", js: true do
+      scenario 'Visitor uploads a file containing a mix of GSS codes and other text' do
+        within '#upload-gss' do
+          attach_file 'csv_upload', File.expand_path('spec/support/gss_etc.csv')
+          click_on 'Upload'
+        end
 
-      page.should have_content 'Step 2 of 4: Review the data'
-      page.should have_content '2 GSS codes imported'
-      page.should have_content '3 rows not imported'
-      find('#non-imported-data').should have_content 'Ham'
-      find('#non-imported-data').should have_content 'Beans'
-      find('#non-imported-data').should have_content 'Eggs'
+        page.should have_content 'Step 2 of 4: Review the data'
+        page.should have_content '2 rows imported'
+        page.should have_content '3 rows not imported'
+
+        click_on 'Show data'
+        find('#non-imported-data').should have_content 'Ham'
+        find('#non-imported-data').should have_content 'Beans'
+        find('#non-imported-data').should have_content 'Eggs'
+      end
+
+      scenario 'Visitor uploads an animal gif' do
+        within '#upload-gss' do
+          attach_file 'csv_upload', File.expand_path('spec/support/dog.gif')
+          click_on 'Upload'
+        end
+
+        page.should have_content 'Step 1 of 4: Upload geographical data'
+        page.should have_content 'The uploaded file did not contain valid CSV data'
+      end
+
+      scenario 'Visitor uploads a file containing GSS codes at both LA and LSOA level' do
+        within '#upload-gss' do
+          attach_file 'csv_upload', File.expand_path('spec/support/gss_mixed.csv')
+          click_on 'Upload'
+        end
+
+        page.should have_content 'Step 1 of 4: Upload geographical data'
+        page.should have_content 'The uploaded file should contain GSS codes at either LSOA or Local Authority level.'
+      end
+
+      scenario 'Visitor just clicks upload without selecting a .csv file' do
+        within '#upload-gss' do
+          click_on 'Upload'
+        end
+
+        page.should have_content 'Step 1 of 4: Upload geographical data'
+        page.should have_content 'Please select a valid .csv file'
+      end
     end
 
-    scenario 'Visitor uploads an animal gif' do
-      visit '/selectors/new'
-      attach_file 'csv_upload', File.expand_path('spec/support/dog.gif')
-      click_on 'Upload'
+    describe 'Creating a new Selector' do
+      background do
+        within '#upload-gss' do
+          attach_file 'csv_upload', File.expand_path('spec/support/gss_etc.csv')
+          click_on 'Upload'
+        end
+      end
 
-      page.should have_content 'Step 1 of 4: Upload GSS Codes'
-      page.should have_content 'The uploaded file did not contain valid CSV data'
-    end
+      scenario 'Accepting the preview and creating a selector' do
+        click_on 'Proceed to next step'
 
-    scenario 'Visitor uploads a file containing GSS codes at both LA and LSOA level' do
-      visit '/selectors/new'
-      attach_file 'csv_upload', File.expand_path('spec/support/gss_mixed.csv')
-      click_on 'Upload'
+        page.should have_content 'Step 3 of 4: Add column data'
+        page.should have_content 'E07000008 Cambridge'
+        page.should have_content 'E07000036 Erewash'
 
-      page.should have_content 'Step 1 of 4: Upload GSS Codes'
-      page.should have_content 'The uploaded file should contain GSS codes at either LSOA or Local Authority level.'
-    end
-
-    scenario 'Visitor just clicks upload without selecting a .csv file' do
-      visit '/selectors/new'
-      click_on 'Upload'
-
-      page.should have_content 'Step 1 of 4: Upload GSS Codes'
-      page.should have_content 'Please select a valid .csv file'
+        page.should_not have_content 'Download'
+      end
     end
   end
 
-  describe 'Creating a new Selector' do
+  context 'based on postcodes' do
     background do
       GeographyTasks.create_some_gss_resources
 
       visit '/selectors/new'
-      attach_file 'csv_upload', File.expand_path('spec/support/gss_etc.csv')
-      click_on 'Upload'
+      click_on 'Upload UK Postcodes'
     end
 
-    scenario 'Accepting the preview and creating a selector' do
-      click_on 'Proceed to next step'
+    describe "Previewing data for a selector", js: true do
+      scenario 'Visitor uploads a file containing a mix of postcodes and other text' do
+        within '#upload-postcodes' do
+          attach_file 'csv_upload', File.expand_path('spec/support/postcodes.csv')
+          click_on 'Upload'
+        end
 
-      page.should have_content 'Step 3 of 4: Add column data'
-      page.should have_content 'E07000008 Cambridge'
-      page.should have_content 'E07000036 Erewash'
+        page.should have_content 'Step 2 of 4: Review the data'
+        page.should have_content '3 rows imported'
+        page.should have_content '2 rows not imported'
 
-      page.should_not have_content 'Download'
+        click_on 'Show data'
+        find('#non-imported-data').should have_content 'V10 L1N'
+        find('#non-imported-data').should have_content 'R0 8OT'
+      end
+
+      scenario 'Visitor uploads an animal gif' do
+        within '#upload-postcodes' do
+          attach_file 'csv_upload', File.expand_path('spec/support/dog.gif')
+          click_on 'Upload'
+        end
+
+        page.should have_content 'Step 1 of 4: Upload geographical data'
+        page.should have_content 'The uploaded file did not contain valid CSV data'
+      end
+
+      scenario 'Visitor just clicks upload without selecting a .csv file' do
+        within '#upload-postcodes' do
+          click_on 'Upload'
+        end
+
+        page.should have_content 'Step 1 of 4: Upload geographical data'
+        page.should have_content 'Please select a valid .csv file'
+      end
+    end
+
+    describe 'Creating a new Selector' do
+      background do
+        within '#upload-postcodes' do
+          attach_file 'csv_upload', File.expand_path('spec/support/postcodes.csv')
+          click_on 'Upload'
+        end
+      end
+
+      scenario 'Accepting the preview and creating a selector' do
+        click_on 'Proceed to next step'
+
+        page.should have_content 'Step 3 of 4: Add column data'
+        page.should have_content 'SK9 4JF'
+        page.should have_content 'Macclesfield 007F'
+        page.should have_content 'M4 1HN'
+        page.should have_content 'Manchester 014C'
+        page.should have_content 'M1 7AR'
+        page.should have_content 'Manchester 014A'
+
+        page.should_not have_content 'Download'
+      end
     end
   end
 

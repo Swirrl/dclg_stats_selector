@@ -5,9 +5,11 @@ module GeographyTasks
       PREFIX sg: <http://statistics.data.gov.uk/id/statistical-geography/>
       PREFIX la: <http://opendatacommunities.org/id/district-council/>
       PREFIX lg: <http://opendatacommunities.org/def/local-government/>
-      PREFIX odclsoa: <http://opendatacommunities.org/id/geography/lsoa/>
+      PREFIX lsoa: <http://opendatacommunities.org/id/geography/lsoa/>
       PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
       PREFIX admingeo: <http://data.ordnancesurvey.co.uk/ontology/admingeo/>
+      PREFIX pc: <http://data.ordnancesurvey.co.uk/id/postcodeunit/>
+      PREFIX og: <http://opendatacommunities.org/def/geography#>
 
       INSERT DATA {
         GRAPH <http://pmdtest.dev/graph/geodata> {
@@ -22,8 +24,30 @@ module GeographyTasks
           la:erewash a lg:LocalAuthority .
           la:erewash lg:governsGSS sg:E07000036 .
           # LSOA E01018171
-          odclsoa:E01018171 skos:notation "E01018171" .
-          odclsoa:E01018171 a <http://opendatacommunities.org/def/geography#LSOA> .
+          lsoa:E01018171 skos:notation "E01018171" .
+          lsoa:E01018171 a og:LSOA .
+          
+          # SK9 4JF
+          pc:SK94JF a <http://data.ordnancesurvey.co.uk/ontology/postcode/PostcodeUnit> .
+          pc:SK94JF rdfs:label "SK9 4JF" .
+          pc:SK94JF og:lsoa lsoa:E01018651 .
+          lsoa:E01018651 a og:LSOA .
+          lsoa:E01018651 rdfs:label "Macclesfield 007F" .
+          lsoa:E01018651 skos:notation "E01018651" .
+          # M4 1HN
+          pc:M41HN a <http://data.ordnancesurvey.co.uk/ontology/postcode/PostcodeUnit> .
+          pc:M41HN rdfs:label "M4 1HN" .
+          pc:M41HN og:lsoa lsoa:E01005131 .
+          lsoa:E01005131 a og:LSOA .
+          lsoa:E01005131 rdfs:label "Manchester 014C" .
+          lsoa:E01005131 skos:notation "E01005131" .
+          # M1 7AR
+          pc:M17AR a <http://data.ordnancesurvey.co.uk/ontology/postcode/PostcodeUnit> .
+          pc:M17AR rdfs:label "M1 7AR" .
+          pc:M17AR og:lsoa lsoa:E01005128 .
+          lsoa:E01005128 a og:LSOA .
+          lsoa:E01005128 rdfs:label "Manchester 014A" .
+          lsoa:E01005128 skos:notation "E01005128" .
         }
       }
     TTL

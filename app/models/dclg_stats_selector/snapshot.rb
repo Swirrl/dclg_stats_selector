@@ -55,7 +55,8 @@ module DclgStatsSelector
       update_body_based_on_dimension(dimension_uri, column_width, column_uris)
     end
 
-    def row_uris_detected(row_uris)
+    def row_uris_detected(row_uris, secondary_row_uris = nil)
+      row_uris = row_uris.zip(secondary_row_uris) if secondary_row_uris
       @body_row_uris.concat(row_uris)
     end
 
@@ -90,15 +91,21 @@ module DclgStatsSelector
       output_builder.document_header_started
       output_builder.document_header_finished
       header_rows.each do |header_row|
-        output_builder.header_row(header_row)
+        output_builder.header_row(header_row, self.has_secondary_row_uris?)
       end
       table_rows.each do |table_row|
         output_builder.table_row(
-          row_uri:    table_row.uri,
-          row_label:  table_row.label,
-          values:     table_row.values
+          row_uri:              table_row.uri,
+          row_label:            table_row.label,
+          secondary_row_uri:    table_row.secondary_uri,
+          secondary_row_label:  table_row.secondary_label,
+          values:               table_row.values
         )
       end
+    end
+
+    def has_secondary_row_uris?
+      @body_row_uris.first.is_a?(Array)
     end
 
     private

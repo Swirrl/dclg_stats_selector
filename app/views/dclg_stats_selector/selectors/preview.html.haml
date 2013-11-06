@@ -16,7 +16,7 @@
         - unless @gss_resource_uris.empty?
           %li#imported
             %i.icon-thumbs-up
-            = pluralize(@gss_resource_uris.size, 'GSS code')
+            = pluralize(@gss_resource_uris.size, 'row')
             imported.
         - unless @non_gss_codes.empty?
           %li#not-imported
@@ -33,6 +33,8 @@
       = form_tag selectors_path, multipart: true do
         = hidden_field_tag :geography_type, @geography_type
         = hidden_field_tag :gss_resource_uri_data, @gss_resource_uri_data
+        - if @secondary_resource_uri_data
+          = hidden_field_tag :secondary_resource_uri_data, @secondary_resource_uri_data
         .submit.primary
           = submit_tag 'Proceed to next step'
           = link_to 'Return to previous step', new_selector_path, class: 'btn btn-cancel'

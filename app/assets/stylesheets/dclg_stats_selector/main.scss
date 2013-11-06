@@ -37,6 +37,21 @@ section#stats-selector {
     }
   }
 
+  .panel-group {
+    form {
+      margin-bottom: 0;
+
+      .help {
+        margin: 0 0 10px 2px;
+        color: $grey;
+      }
+
+      .submit input {
+        margin-bottom: 0;
+      }
+    }
+  }
+
   &.step-two {
     .submit {
       text-align: center;
@@ -112,6 +127,9 @@ section#preview, section#download {
       }
       th {
         min-width: 180px;
+      }
+      th.secondary {
+        min-width: 60px;
       }
     }
 
