@@ -23,4 +23,10 @@ $(function() {
     fragmentElements.removeClass('highlight');
     fragmentElements.find('.btn').hide();
   });
+
+  // always reload modals
+  $('.modal').on('hidden.bs.modal', function() {
+    $(this).removeData();
+    $(this).empty();
+  });
 });

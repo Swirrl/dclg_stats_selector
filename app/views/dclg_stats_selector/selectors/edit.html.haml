@@ -34,7 +34,7 @@
           %i.icon-check
           Done
 
-#add-data-modal(style="display: none;")
+#add-data-modal.modal(style="display: none;")
 
 
 #add-data-spinner.modal-dialog
@@ -47,11 +47,6 @@
 :javascript
   $(function() {
     var spinner = $('#add-data-spinner').detach();
-
-    $('#add-data-modal').on('hidden.bs.modal', function() {
-      $(this).removeData();
-      $('#add-data-modal').empty();
-    });
 
     $('#add-data-modal').on('show.bs.modal', function() {
       $('#add-data-modal').append(spinner);
