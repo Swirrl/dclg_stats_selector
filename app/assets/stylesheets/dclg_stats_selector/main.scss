@@ -58,6 +58,9 @@ section#stats-selector {
     }
   }
   &.step-three, &.step-four {
+    header > h2 {
+      margin-bottom: 20px;
+    }
     .actions {
       > a {
         margin-right:4px;

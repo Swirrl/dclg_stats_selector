@@ -87,7 +87,7 @@ module DclgStatsSelector
     def download
       snapshot = @selector.build_snapshot
       filename = "statistics"
-      source_url = "[source link not currently stored]" # selector_url(selector)
+      source_url = selector_url(@selector)
       output_builder = CSVBuilder.build(
         site_name:  PublishMyData.local_domain,
         source_url: source_url,
