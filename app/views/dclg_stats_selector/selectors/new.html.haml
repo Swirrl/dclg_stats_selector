@@ -30,9 +30,9 @@
               %a(data-toggle="collapse" data-parent="#upload-data" href="#upload-postcodes") Upload UK Postcodes
           #upload-postcodes.collapse.panel-collapse
             .panel-body
-              = form_tag preview_selectors_path(postcode: true), multipart: true do          
+              = form_tag preview_selectors_path(postcode: true), multipart: true do
                 = file_field_tag :csv_upload
-                .help 
+                .help
                   Postcodes will be matched against
                   %a(href="/data/lower-layer-super-output-areas" target="_blank") LSOA
                 .submit.primary
@@ -55,9 +55,4 @@
 
         The file can have a maximum of 500 rows and should contain only local authorities, only LSOAs *or* UK Postcodes.
 
-        For example:
-
-            E08000025
-            E08000021
-            E09000014
-            E06000054
+        For example. try uploading this [GSS codes CSV file](/example_gss_codes.csv) or this [postcodes CSV file](/example_post_codes.csv).
