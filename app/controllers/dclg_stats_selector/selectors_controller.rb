@@ -21,7 +21,7 @@ module DclgStatsSelector
       uri_candidates =
         begin
           CSV.read(params[:csv_upload].path).map(&:first)
-        rescue ArgumentError
+        rescue ArgumentError, CSV::MalformedCSVError
           (invalid_upload && return)
         end
 

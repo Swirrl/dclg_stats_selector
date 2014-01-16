@@ -34,6 +34,23 @@ module DclgStatsSelector
         end
       end
 
+      context "given a mangled CSV file" do
+        let(:invalid_upload) {
+          temp_file = File.new(File.join(Rails.root, '../support/malformed.csv'))
+          ActionDispatch::Http::UploadedFile.new(tempfile: temp_file, filename: File.basename(temp_file.path))
+        }
+
+        it "should respond successfully" do
+          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
+          response.should be_success
+        end
+
+        it "should flash an error message" do
+          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
+          flash[:error].should_not be_nil
+        end
+      end
+
       context "given a file containing a mix of LA and LSOA GSS codes" do
         let(:invalid_upload) {
           temp_file = File.new(File.join(Rails.root, '../support/gss_mixed.csv'))
