@@ -63,7 +63,7 @@ module DclgStatsSelector
     private
 
     def gss_codes_and_uris(gss_codes)
-      gss_code_string = gss_codes.map{ |code| %'"#{code}"'}.join(', ')
+      gss_code_string = gss_codes.map{ |code| %'"#{URI.escape(code)}"'}.join(', ')
 
       query_results = Tripod::SparqlClient::Query.select(<<-SPARQL
         SELECT DISTINCT ?uri ?code ?type
