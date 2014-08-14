@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", "~> 4.1.4"
-  s.add_dependency "publish_my_data"
+  s.add_dependency "publish_my_data", ">=2.0"
   s.add_dependency "mongoid"
   s.add_dependency "jquery-rails"
   s.add_dependency "haml"
