@@ -5,27 +5,28 @@
 
 -# page_title "Statistics Selector: Add column data"
 
+.stripe
+  =fullwidth do
+    %section#stats-selector.step-four
+      .row.container
+        .sixteen.columns
+          %header
+            %h3 Statistics Selector
+            %h1 Step 4 of 4: Download Data
+            %h3 Permalink
+            %h2.click-to-select= selector_url(@selector)
 
-%section#stats-selector.step-four
-  .row.container
-    .sixteen.columns
-      %header
-        %h3 Statistics Selector
-        %h1 Step 4 of 4: Download Data
-        %h3 Permalink
-        %h2.click-to-select= selector_url(@selector)
-
-      %section#download
-        %header PREVIEW
-        %table
-          = render 'snapshot', snapshot: @snapshot
-          %tfoot
-            %tr
-              %td &hellip;
-      .actions
-        = link_to download_selector_path(@selector), class: 'btn primary', id: 'download-selector' do
-          %i.icon-download
-          Download
-        = link_to duplicate_selector_path(@selector), method: :put, class: 'btn secondary', id: 'duplicate-selector' do
-          %i.icon-pencil
-          Edit
+          %section#download
+            %header PREVIEW
+            %table
+              = render 'snapshot', snapshot: @snapshot
+              %tfoot
+                %tr
+                  %td &hellip;
+          .actions
+            = link_to download_selector_path(@selector), class: 'btn primary', id: 'download-selector' do
+              %i.icon-download
+              Download
+            = link_to duplicate_selector_path(@selector), method: :put, class: 'btn secondary', id: 'duplicate-selector' do
+              %i.icon-pencil
+              Edit

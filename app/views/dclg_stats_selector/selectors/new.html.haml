@@ -1,58 +1,50 @@
-- content_for :data_crumb do
-  %ol.breadcrumb
-    %li= link_to 'Home', '/'
-    %li= link_to 'Statistics Selector', '#'
+-# - content_for :data_crumb do
+-#   %ol.breadcrumb
+-#     %li= link_to 'Home', '/'
+-#     %li= link_to 'Statistics Selector', '#'
 
 -# page_title "Statistics Selector: Upload GSS Codes"
 
-%section#stats-selector
-  .row.container
-    .sixteen.columns
-      %h3 Statistics Selector
-      %h1 Step 1 of 4: Upload geographical data
-  .row.container
-    .eight.columns
-      %h4 Please select from one of the following options:
-      #upload-data.panel-group
-        .panel.panel-default
-          .panel-heading
-            %h4.panel-title
-              %a(data-toggle="collapse" data-parent="#upload-data" href="#upload-gss") Upload GSS Codes
-          #upload-gss.collapse.panel-collapse
-            .panel-body
-              = form_tag preview_selectors_path, multipart: true do
-                = file_field_tag :csv_upload
-                .submit.primary
-                  = submit_tag 'Upload'
-        .panel.panel-default
-          .panel-heading
-            %h4.panel-title
-              %a(data-toggle="collapse" data-parent="#upload-data" href="#upload-postcodes") Upload UK Postcodes
-          #upload-postcodes.collapse.panel-collapse
-            .panel-body
-              = form_tag preview_selectors_path(postcode: true), multipart: true do
-                = file_field_tag :csv_upload
-                .help
-                  Postcodes will be matched against
-                  %a(href="/data/lower-layer-super-output-areas" target="_blank") LSOA
-                .submit.primary
-                  = submit_tag 'Upload'
-      - if flash[:error]
-        .error= flash[:error]
-    .seven.columns.offset-by-one
-      :markdown
-        ###What is this?
+.stripe
+  = fullwidth do
+    %section#stats-selector
+      .row.container
+        .sixteen.columns
+          %h3 Statistics Selector
+          %h1 Step 1 of 4: Upload geographical data
+      .row.container
+        .eight.columns
+          %h4 Please select from one of the following options:
 
-        This **Statistics Selector** lets you choose data from across the range of DCLG datasets, selecting values for the geographical areas that interest you.
+          %h5 Upload GSS Codes
+          = form_tag preview_selectors_path, multipart: true do
+            = file_field_tag :csv_upload
+            .submit.primary
+              = submit_tag 'Upload'
+          %h5 Upload UK Postcodes
+          = form_tag preview_selectors_path(postcode: true), multipart: true do
+            = file_field_tag :csv_upload
+            .help
+              Postcodes will be matched against
+              %a(href="/data/lower-layer-super-output-areas" target="_blank") LSOA
+            .submit.primary
+              = submit_tag 'Upload'
+          - if flash[:error]
+            .error= flash[:error]
+        .seven.columns.offset-by-one
+          :markdown
+            ###What is this?
 
-        ###Get started
+            This **Statistics Selector** lets you choose data from across the range of DCLG datasets, selecting values for the geographical areas that interest you.
 
-        Upload a CSV or text file with a single __GSS code__ or __UK Postcode__ on each line (for example by making a spreadsheet with a single column and saving it as Comma Separated Values).
+            ###Get started
 
-        The GSS code is the Office for National Statistics identifier for a geographical region. It consists of a letter followed by 8 digits. The tool currently works for English local authorities (with codes starting E06, E07, E08 or E09) or for English LSOAs (codes starting E01).
+            Upload a CSV or text file with a single __GSS code__ or __UK Postcode__ on each line (for example by making a spreadsheet with a single column and saving it as Comma Separated Values).
 
-        You can find the definitive list of codes on the ONS website ([Local Authorities](https://geoportal.statistics.gov.uk/Docs/Names%20and%20Codes/Local_authority_districts_\(UK\)_2012_Names_and_Codes.zip), [LSOAs](https://geoportal.statistics.gov.uk/Docs/Names%20and%20Codes/Lower_layer_super_output_areas_\(E+W\)_2001_Names_and_Codes.zip)).  There is also this useful summary on [Wikipedia](http://en.wikipedia.org/wiki/ONS_coding_system).
+            The GSS code is the Office for National Statistics identifier for a geographical region. It consists of a letter followed by 8 digits. The tool currently works for English local authorities (with codes starting E06, E07, E08 or E09) or for English LSOAs (codes starting E01).
 
-        The file can have a maximum of 500 rows and should contain only local authorities, only LSOAs *or* UK Postcodes.
+            You can find the definitive list of codes on the ONS website ([Local Authorities](https://geoportal.statistics.gov.uk/Docs/Names%20and%20Codes/Local_authority_districts_\(UK\)_2012_Names_and_Codes.zip), [LSOAs](https://geoportal.statistics.gov.uk/Docs/Names%20and%20Codes/Lower_layer_super_output_areas_\(E+W\)_2001_Names_and_Codes.zip)).  There is also this useful summary on [Wikipedia](http://en.wikipedia.org/wiki/ONS_coding_system).
 
-        For example. try uploading this [GSS codes CSV file](/example_gss_codes.csv) or this [postcodes CSV file](/example_post_codes.csv).
+            The file can have a maximum of 500 rows and should contain only local authorities, only LSOAs *or* UK Postcodes.
+
+            For example. try uploading this [GSS codes CSV file](/example_gss_codes.csv) or this [postcodes CSV file](/example_post_codes.csv).

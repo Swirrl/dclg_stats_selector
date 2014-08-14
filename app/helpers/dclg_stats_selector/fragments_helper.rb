@@ -25,5 +25,9 @@ module DclgStatsSelector
 
       grouped_datasets
     end
+
+    def options_for_dataset_select(datasets)
+      options_for_select(datasets.map{ |dataset| [dataset.title, dataset.uri.to_s] })
+    end
   end
 end

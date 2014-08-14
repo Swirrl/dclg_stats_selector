@@ -67,6 +67,24 @@ module DclgStatsSelector
       volume_at_level(bottom_level)
     end
 
+    def dimensions=(dims)
+      dims = dims.reduce({}) do |memo, (key, value)|
+        key = key.gsub('.', '__')
+        memo[key] = value
+        memo
+      end
+      write_attribute(:dimensions, dims)
+    end
+
+    def dimensions
+      dims = read_attribute(:dimensions)
+      dims.reduce({}) do |memo, (key, value)|
+        key = key.gsub('__', '.')
+        memo[key] = value
+        memo
+      end
+    end
+
     private
 
     # Candidate for the prize for "most specific enumeration method"

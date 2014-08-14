@@ -64,7 +64,7 @@ module DclgStatsSelector
     end
 
     def deep_copy
-      Selector.new(self.attributes.merge({
+      Selector.new(self.attributes.except('_id').merge({
         finished: false,
         fragments: self.fragments.map(&:deep_copy)
       }))

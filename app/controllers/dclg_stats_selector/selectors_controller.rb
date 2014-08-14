@@ -69,7 +69,7 @@ module DclgStatsSelector
       @snapshot = @selector.build_snapshot(row_limit: 7)
     end
 
-    def finish  
+    def finish
       @selector.finish!
       redirect_to selector_path(@selector)
     end
@@ -89,7 +89,7 @@ module DclgStatsSelector
       filename = "statistics"
       source_url = selector_url(@selector)
       output_builder = CSVBuilder.build(
-        site_name:  PublishMyData.local_domain,
+        site_name:  PublishMyData.request_root,
         source_url: source_url,
         timestamp:  Time.now
       )

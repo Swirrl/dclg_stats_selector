@@ -7,7 +7,7 @@
         %h1 Step 1 of 2: Select a Dataset
 
         = form_tag new_selector_fragment_path(@selector), method: :get, remote: true do
-          = select_tag :dataset_uri, grouped_options_for_select(group_datasets_by_theme(@datasets, @themes)), class: 'form-control'
+          = select_tag :dataset_uri, options_for_dataset_select(@datasets), class: 'form-control'
           .submit.primary
             = submit_tag 'Select Dataset', class: 'btn btn-primary', id: 'select-dataset'
             .spinner(style="display: none;")

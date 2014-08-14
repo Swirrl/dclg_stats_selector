@@ -6,7 +6,6 @@ module DclgStatsSelector
 
     def datasets
       @datasets = GeographyService.geographical_data_cubes(@selector.geography_type)
-      @themes = PublishMyData::Theme.all.resources
 
       respond_to do |format|
         format.html { render layout: false }
