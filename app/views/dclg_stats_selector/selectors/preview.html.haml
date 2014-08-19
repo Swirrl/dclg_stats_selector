@@ -26,7 +26,7 @@
                 = pluralize(@non_gss_codes.size, 'row')
                 not imported.
                 = link_to 'Show data', '#', id: 'reveal-non-imported-data'
-                %code#non-imported-data
+                %code#non-imported-data(style="display: none;")
                   %pre
                     - @non_gss_codes.each do |non_gss_code|
                       = non_gss_code
@@ -38,5 +38,5 @@
             - if @secondary_resource_uri_data
               = hidden_field_tag :secondary_resource_uri_data, @secondary_resource_uri_data
             .submit.primary
-              = submit_tag 'Proceed to next step'
+              = submit_tag 'Proceed to next step', class: 'btn btn-primary'
               = link_to 'Return to previous step', new_selector_path, class: 'btn btn-cancel'

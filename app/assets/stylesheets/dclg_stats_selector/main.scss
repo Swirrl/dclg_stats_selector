@@ -147,8 +147,8 @@ section#preview, section#download {
 
         a.btn-remove-data {
           display: inline-block;
-          background-color: $lightGrey;
-          color: $grey !important;
+          // background-color: $lightGrey;
+          //color: $grey !important;
 
           &:hover {
             background-color: darken($lightGrey, 5%);

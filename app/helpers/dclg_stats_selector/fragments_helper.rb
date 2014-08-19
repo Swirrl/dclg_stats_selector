@@ -26,8 +26,21 @@ module DclgStatsSelector
       grouped_datasets
     end
 
-    def options_for_dataset_select(datasets)
-      options_for_select(datasets.map{ |dataset| [dataset.title, dataset.uri.to_s] })
+    def options_for_select_from_tree(tree)
+      # build up a hash containing group names (>-separated folder paths)
+      options = {}
+      tree.each_leaf do |node|
+        option = [node.content[:label], node.name] # label, URI
+        opt_group = node.parentage.reverse.map{|n| n.content[:label]}.join(' > ')
+        options[opt_group] ||= []
+        options[opt_group] << option
+        options
+      end
+      # now reduce our sensible hash to the grouped_options_for_select format
+      options_as_array = options.reduce([]) do |memo, (key, value)|
+        memo << [key, value]
+      end
+      grouped_options_for_select(options_as_array)
     end
   end
 end

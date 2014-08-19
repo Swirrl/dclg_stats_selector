@@ -8,7 +8,7 @@
 
   = form_tag selector_fragments_path(@selector) do
     = hidden_field_tag :dataset_uri, @dataset.uri
-  
+
     %p#no-filters
       %em All possible combinations of dataset dimension are currently chosen. To reduce the amount of data, select some dimension values to filter by.
     #filters(style="display: none;")
@@ -46,7 +46,7 @@
       .submit.primary
         = submit_tag "Add #{column_count(@dimensions)} columns of data", id: 'submit-fragment'
         = link_to 'Pick a different data set', datasets_selector_fragments_path(@selector), id: 'pick-again', class: 'btn btn-cancel', remote: true
-        .spinner(style="display: none;")
+        .spin(style="display: none;")
           = image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'
 
 :javascript
@@ -124,7 +124,7 @@
         filterOption = $('#' + filter.attr('id').replace('filter-', '')),
         filterList = filter.parent(),
         anchor;
-    
+
     filter.hide();
     filterOption.show();
 
@@ -144,5 +144,5 @@
   });
 
   $('#submit-fragment, #pick-again').click(function() {
-    $('.spinner').show();
+    $('.spin').show();
   });

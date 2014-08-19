@@ -3,9 +3,12 @@ module DclgStatsSelector
     before_filter :get_selector, only: [ :edit, :finish, :show, :download, :duplicate, :destroy ]
     before_filter :redirect_if_finished, only: [ :edit ]
     before_filter :redirect_unless_finished, only: [ :show, :download ]
+    before_filter :crumbs
 
     rescue_from GeographyService::TooManyGSSCodesError, with: :too_many_gss_codes
     rescue_from GeographyService::TooManyGSSCodeTypesError, with: :mixed_gss_codes
+
+    include PublishMyData::CrumbtrailRendering
 
     def new
     end
@@ -104,6 +107,11 @@ module DclgStatsSelector
 
     def get_selector
       @selector = Selector.find(params[:id])
+    end
+
+    def crumbs
+      initialize_empty_crumbtrail
+      prepend_crumb('Foo', '/foo')
     end
 
     def invalid_upload

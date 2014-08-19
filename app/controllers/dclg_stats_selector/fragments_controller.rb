@@ -5,7 +5,8 @@ module DclgStatsSelector
     before_filter :get_fragment, only: [ :destroy ]
 
     def datasets
-      @datasets = GeographyService.geographical_data_cubes(@selector.geography_type)
+      datasets = GeographyService.geographical_data_cubes(@selector.geography_type)
+      @tree = filtered_tree(build_site_trees.first, datasets)
 
       respond_to do |format|
         format.html { render layout: false }
@@ -64,6 +65,23 @@ module DclgStatsSelector
 
     def get_fragment
       @fragment = @selector.fragments.find(params[:id])
+    end
+
+    def filtered_tree(tree, datasets)
+      filtered_tree = tree.tree_node.dup
+      # build an array of all nodes to be included in the filter
+      filtered_nodes = datasets.reduce([]) do |memo, dataset|
+        leaf = tree.find_node_with_uri(dataset.uri)
+        puts leaf.try(:parentage).to_s
+        if leaf
+          nodes = leaf.parentage + [leaf]
+          memo = memo | nodes
+        end
+        memo
+      end
+      filtered_tree.breadth_each do |node|
+        node.remove_from_parent! unless filtered_nodes.include?(node)
+      end
     end
 
     # Converts {dimension_uri => csv_dimension_value_data} to {dimension_uri => [dim_value_1, ...]}
