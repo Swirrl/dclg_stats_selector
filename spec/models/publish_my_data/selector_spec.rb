@@ -175,20 +175,6 @@ module DclgStatsSelector
       end
     end
 
-    describe '#finish!' do
-      let(:selector) { FactoryGirl.build(:selector) }
-
-      it 'should set finished to true' do
-        selector.finish!
-        selector.finished.should be_true
-      end
-
-      it 'should persist its finished status' do
-        selector.finish!
-        Selector.find(selector.id).finished.should be_true
-      end
-    end
-
     describe '#deep_copy' do
       let(:fragment) { FactoryGirl.build(:fragment) }
       let(:selector) { FactoryGirl.build(:selector, fragments: [ fragment ]) }
@@ -206,12 +192,8 @@ module DclgStatsSelector
         new_selector.fragments.first.dataset_uri.should == selector.fragments.first.dataset_uri
       end
 
-      context 'given a selector which is marked as finished' do
-        before { selector.finish! }
-        
-        it 'should not be marked as finished' do
-          new_selector.finished.should be_false
-        end
+      it 'should have already been persisted to the database' do
+        expect(new_selector.new_record?).to be_falsey
       end
     end
   end

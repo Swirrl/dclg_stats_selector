@@ -1,32 +1,33 @@
-- content_for :data_crumb do
-  %ol.breadcrumb
-    %li= link_to 'Home', '/'
-    %li= link_to 'Statistics Selector', '#'
-
--# page_title "Statistics Selector: Add column data"
-
 .stripe
   =fullwidth do
-    %section#stats-selector.step-four
-      .row.container
-        .sixteen.columns
-          %header
-            %h3 Statistics Selector
-            %h1 Step 4 of 4: Download Data
-            %h3 Permalink
-            %h2.click-to-select= selector_url(@selector)
+    = render partial: 'imported', locals: { row_count: @imported_count, non_gss_codes: @non_gss_codes } if @imported_count
 
-          %section#download
-            %header PREVIEW
-            %table
-              = render 'snapshot', snapshot: @snapshot
-              %tfoot
-                %tr
-                  %td &hellip;
-          .actions
-            = link_to download_selector_path(@selector), class: 'btn primary', id: 'download-selector' do
-              %i.icon-download
-              Download
-            = link_to duplicate_selector_path(@selector), method: :put, class: 'btn secondary', id: 'duplicate-selector' do
-              %i.icon-pencil
-              Edit
+    .tuple
+      .predicate URI
+      .object= selector_url(@selector)
+
+    %section
+      %header PREVIEW
+      %table
+        = render 'snapshot', snapshot: @snapshot
+        %tfoot
+          %tr
+            %td &hellip;
+            - if @snapshot.has_secondary_row_uris?
+              %td
+            - @selector.fragments.each do |fragment|
+              %th.fragment-actions{ colspan: fragment.volume_of_selected_cube, class: dom_class_for_fragment(fragment) }
+                = link_to selector_fragment_path(@selector, id: fragment.id), class: 'remove-fragment', method: :delete do
+                  Remove Data
+      .actions
+        = link_to datasets_selector_fragments_path(@selector), class: 'btn', id: 'add-data-button', remote: true do
+          Add Data
+        = link_to download_selector_path(@selector), class: 'btn' do
+          Download
+        :javascript
+          $('#add-data-button').click(function() {
+            $('.spin').show();
+          });
+    %section#add-data
+      .spin(style="display: none;")
+        = image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'

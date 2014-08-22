@@ -26,7 +26,7 @@ module GeographyTasks
           # LSOA E01018171
           lsoa:E01018171 skos:notation "E01018171" .
           lsoa:E01018171 a og:LSOA .
-          
+
           # SK9 4JF
           pc:SK94JF a <http://data.ordnancesurvey.co.uk/ontology/postcode/PostcodeUnit> .
           pc:SK94JF rdfs:label "SK9 4JF" .
@@ -57,14 +57,17 @@ module GeographyTasks
   def self.create_relevant_vocabularies
     Tripod::SparqlClient::Update.update(<<-TTL
       PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
       PREFIX gce:   <http://opendatacommunities.org/def/concept/general-concepts/ethnicity/>
-      PREFIX theme: <http://opendatacommunities.org/def/concept/themes/>
       PREFIX rp:    <http://reference.data.gov.uk/id/quarter/>
       PREFIX og:    <http://opendatacommunities.org/def/ontology/geography/>
       PREFIX ot:    <http://opendatacommunities.org/def/ontology/time/>
       PREFIX oha:   <http://opendatacommunities.org/def/ontology/homelessness/homelessness-acceptances/>
       PREFIX qb:    <http://purl.org/linked-data/cube#>
-      
+      PREFIX pc:    <#{PublishMyData.linked_data_root}/def/concept-scheme/>
+      PREFIX pf:    <http://publishmydata.com/def/ontology/folder/>
+      PREFIX pfc:   <#{PublishMyData.linked_data_root}/def/concept/folders/themes/>
+
       INSERT DATA {
         GRAPH <http://pmdtest.dev/vocabularies/all> {
           # Ethnicities
@@ -85,10 +88,16 @@ module GeographyTasks
           # Measure Properties
           oha:homelessnessAcceptancesObs a qb:MeasureProperty .
         }
-        # Themes
-        GRAPH <#{PublishMyData::Theme.theme_graph}> {
-          theme:homelessness a <#{RDF::SITE.Theme}> .
-          theme:homelessness rdfs:label "Homeslessness" .
+
+        GRAPH <#{PublishMyData.linked_data_root}/graph/concept-scheme/folders> {
+          pc:folders a skos:ConceptScheme .
+          pc:folders pf:hasTree pfc:Everything .
+          pc:folders pf:defaultTree pfc:Everything .
+
+          pfc:Everything a <http://publishmydata.com/def/ontology/folder/Folder> .
+          pfc:Everything rdfs:label "All things" .
+          pfc:Everything pf:inTree pfc:Everything .
+          pfc:Everything skos:inScheme pc:folders .
         }
       }
     TTL
@@ -105,13 +114,15 @@ module GeographyTasks
       PREFIX ot:    <http://opendatacommunities.org/def/ontology/time/>
       PREFIX oha:   <http://opendatacommunities.org/def/ontology/homelessness/homelessness-acceptances/>
       PREFIX gce:   <http://opendatacommunities.org/def/concept/general-concepts/ethnicity/>
-      PREFIX theme: <http://opendatacommunities.org/def/concept/themes/>
       PREFIX rp:    <http://reference.data.gov.uk/id/quarter/>
       PREFIX qb:    <http://purl.org/linked-data/cube#>
-      
+      PREFIX pf:    <http://publishmydata.com/def/ontology/folder/>
+      PREFIX pfc:   <#{PublishMyData.linked_data_root}/def/concept/folders/themes/>
+
       INSERT DATA {
-        GRAPH <#{ dataset.metadata_graph_uri }> {
-          <#{dataset.uri}> dcat:theme theme:homelessness .
+        GRAPH <#{ dataset.graph_uri }> {
+          <#{dataset.uri}> rdfs:label "#{dataset.title}" .
+          <#{dataset.uri}> pf:inFolder pfc:Everything .
         }
         GRAPH <#{ dataset.data_graph_uri }> {
           obs:1 qb:dataSet                      <#{dataset.uri}> .

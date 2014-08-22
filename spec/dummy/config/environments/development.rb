@@ -30,7 +30,8 @@ Dummy::Application.configure do
   config.assets.debug = true
 
   PublishMyData.configure do |config|
-    config.sparql_endpoint = 'http://localhost:3030/pmd/sparql'
+    # config.sparql_endpoint = 'http://localhost:3030/pmd/sparql'
+    config.sparql_endpoint = 'http://192.168.0.184:3030/odc-staging/sparql'
     config.local_domain = 'pmd.dev'
 
     config.downloads_s3_bucket = "publishmydata-dev"

@@ -1,0 +1,13 @@
+.imported
+  = pluralize(row_count, 'row')
+  imported.
+- unless @non_gss_codes.empty?
+  .not-imported
+    = pluralize(non_gss_codes.size, 'row')
+    not imported.
+    = link_to 'Show data', '#', id: 'reveal-non-imported-data'
+    %code#non-imported-data(style="display: none;")
+      %pre
+        - non_gss_codes.each do |non_gss_code|
+          = non_gss_code
+          \

@@ -13,7 +13,7 @@ gemspec
 # To use debugger
 # gem 'debugger'
 
-# gem 'publish_my_data_enterprise', git: 'https://github.com/Swirrl/publish_my_data.git', branch: 'edge'
+# gem 'publish_my_data', git: 'https://github.com/Swirrl/publish_my_data_2.git'
 gem 'publish_my_data', path: '../publish_my_data'
 
 group :test, :development do

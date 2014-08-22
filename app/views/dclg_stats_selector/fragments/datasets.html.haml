@@ -1,20 +1,13 @@
-#new-fragment.modal-dialog
-  .modal-content
-    .modal-body
-      %a.close(href="#" data-dismiss="modal") &times;
-      .step-one
-        %h3 Add data
-        %h1 Step 1 of 2: Select a Dataset
+#select-dataset
+  %h3 Add data
+  = form_tag new_selector_fragment_path(@selector), id: 'nsf', method: :get, remote: true do
+    = select_tag :dataset_uri, options_for_select_from_tree(@tree), class: 'form-control'
+    = submit_tag 'Select Dataset', class: 'btn', id: 'select-dataset-button'
+    .spin(style="display: none;")
+      = image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'
 
-        = form_tag new_selector_fragment_path(@selector), method: :get, remote: true do
-          = select_tag :dataset_uri, options_for_dataset_select(@datasets), class: 'form-control'
-          .submit.primary
-            = submit_tag 'Select Dataset', class: 'btn btn-primary', id: 'select-dataset'
-            .spinner(style="display: none;")
-              = image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'
-:javascript
-  $.Event('pmd.modal.loaded', {});
-
-  $('#select-dataset').click(function() {
-    $('.spinner').show();
-  });
+  :javascript
+    $('#select-dataset-button').click(function() {
+      $('.spin').show();
+      $('#nsf').submit();
+    });

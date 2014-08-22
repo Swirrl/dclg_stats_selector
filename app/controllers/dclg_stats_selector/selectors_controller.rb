@@ -1,90 +1,42 @@
 module DclgStatsSelector
   class SelectorsController < PublishMyData::ApplicationController
-    before_filter :get_selector, only: [ :edit, :finish, :show, :download, :duplicate, :destroy ]
-    before_filter :redirect_if_finished, only: [ :edit ]
-    before_filter :redirect_unless_finished, only: [ :show, :download ]
+    before_filter :get_selector, only: [ :show, :download ]
+    before_filter :crumbs
 
     rescue_from GeographyService::TooManyGSSCodesError, with: :too_many_gss_codes
     rescue_from GeographyService::TooManyGSSCodeTypesError, with: :mixed_gss_codes
 
+    include PublishMyData::CrumbtrailRendering
+    
     def new
     end
 
-    def preview
-      (no_file_uploaded && return) unless params[:csv_upload].present?
-
-      geography_service = GeographyService.new
-
-      # The error handling used to live in the Selector, and I've preserved the
-      # use of rescue_from for now, hence catching and raising an error within
-      # the controller
-      uri_candidates =
-        begin
-          CSV.read(params[:csv_upload].path).map(&:first)
-        rescue ArgumentError, CSV::MalformedCSVError
-          (invalid_upload && return)
-        end
-
-      if params[:postcode]
-        data = geography_service.uris_for_postcodes(uri_candidates)
-
-        @gss_resource_uris        = data.fetch(:gss_resource_uris)
-        @secondary_resource_uris  = data.fetch(:secondary_resource_uris)
-        @non_gss_codes            = data.fetch(:non_gss_codes)
-        @geography_type           = 'http://opendatacommunities.org/def/geography#LSOA'
-
-        @secondary_resource_uri_data = @secondary_resource_uris.join(', ')
-      else
-        data = geography_service.uris_and_geography_type_for_gss_codes(uri_candidates)
-
-        @gss_resource_uris  = data.fetch(:gss_resource_uris)
-        @non_gss_codes      = data.fetch(:non_gss_codes)
-        @geography_type     = data.fetch(:geography_type)
-      end
-
-      @gss_resource_uri_data = @gss_resource_uris.join(', ')
-
-      respond_to do |format|
-        format.html
-      end
-    end
-
     def create
-      gss_resource_uris = params[:gss_resource_uri_data].split(', ')
-      secondary_resource_uris = nil
-      if params[:secondary_resource_uri_data]
-        secondary_resource_uris = params[:secondary_resource_uri_data].split(', ')
-      end
+      (no_file_uploaded && return) unless params[:csv_upload]
+
+      data = process_csv_upload(params[:csv_upload], { postcode: params[:postcode] })
+      (invalid_upload && return) unless data
 
       @selector = Selector.create(
-        geography_type:       params[:geography_type],
-        row_uris:             gss_resource_uris,
-        secondary_row_uris:   secondary_resource_uris
+        geography_type:       data.fetch(:geography_type, 'http://opendatacommunities.org/def/geography#LSOA'),
+        row_uris:             data.fetch(:gss_resource_uris),
+        secondary_row_uris:   data.fetch(:secondary_resource_uris, nil)
       )
 
-      redirect_to edit_selector_path(@selector)
-    end
-
-    def edit
-      @snapshot = @selector.build_snapshot(row_limit: 7)
-    end
-
-    def finish
-      @selector.finish!
-      redirect_to selector_path(@selector)
+      redirect_to selector_path(@selector, imported: @selector.row_uris.count, not_imported: data.fetch(:non_gss_codes).join(','))
     end
 
     def show
       @snapshot = @selector.build_snapshot(row_limit: 7)
-    end
 
-    def duplicate
-      @selector = @selector.deep_copy
-      @selector.save
-      redirect_to @selector
+      if params[:imported]
+        @imported_count = params[:imported].to_i
+        @non_gss_codes = params[:not_imported].split(',')
+      end
     end
 
     def download
+      @selector = @selector.deep_copy
       snapshot = @selector.build_snapshot
       filename = "statistics"
       source_url = selector_url(@selector)
@@ -106,24 +58,55 @@ module DclgStatsSelector
       @selector = Selector.find(params[:id])
     end
 
+    def process_csv_upload(upload, opts={})
+      is_postcode_data = opts.fetch(:postcode, false)
+
+      geography_service = GeographyService.new
+
+      # The error handling used to live in the Selector, and I've preserved the
+      # use of rescue_from for now, hence catching and raising an error within
+      # the controller
+      uri_candidates =
+        begin
+          CSV.read(upload.path).map(&:first)
+        rescue ArgumentError, CSV::MalformedCSVError
+          return nil
+        end
+
+      data = nil
+      if is_postcode_data
+        data = geography_service.uris_for_postcodes(uri_candidates)
+        data.merge({ geography_type: 'http://opendatacommunities.org/def/geography#LSOA' })
+      else
+        data = geography_service.uris_and_geography_type_for_gss_codes(uri_candidates)
+      end
+
+      data
+    end
+
+    def crumbs
+      initialize_empty_crumbtrail
+      prepend_crumb('Spreadsheet Builder', new_selector_path)
+    end
+
     def invalid_upload
       flash.now[:error] = 'The uploaded file did not contain valid CSV data, please check and try again.'
-      render :new
+      render :new, status: :bad_request
     end
 
     def mixed_gss_codes
       flash.now[:error] = 'The uploaded file should contain GSS codes at either LSOA or Local Authority level.'
-      render :new
+      render :new, status: :bad_request
     end
 
     def too_many_gss_codes
       flash.now[:error] = 'The uploaded file contains more than 500 GSS codes, please reduce its size and try again.'
-      render :new
+      render :new, status: :bad_request
     end
 
     def no_file_uploaded
       flash.now[:error] = 'Please select a valid .csv file'
-      render :new
+      render :new, status: :bad_request
     end
 
     def redirect_if_finished

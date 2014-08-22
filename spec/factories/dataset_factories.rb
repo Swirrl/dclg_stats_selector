@@ -7,7 +7,7 @@ FactoryGirl.define do
     ignore do
       slug "my/dataset"
     end
-    data_graph_uri { PublishMyData::Dataset.data_graph_uri(slug) }
+    data_graph_uri { PublishMyData::Dataset.data_graph_uri_from_slug(slug) }
     ignore do
       uri { PublishMyData::Dataset.uri_from_slug(slug)  }
       graph_uri { PublishMyData::Dataset.metadata_graph_uri(slug) }
@@ -27,7 +27,7 @@ FactoryGirl.define do
     title 'My Geo-dataset'
     description 'A test dataset containing geographical data'
     modified DateTime.parse('2010-07-01 12:00')
-    data_graph_uri PublishMyData::Dataset.data_graph_uri("my/geo/dataset")
+    data_graph_uri PublishMyData::Dataset.data_graph_uri_from_slug("my/geo/dataset")
     ignore do
       uri { PublishMyData::Dataset.uri_from_slug("my/geo/dataset")  }
       graph_uri { PublishMyData::Dataset.metadata_graph_uri("my/geo/dataset") }

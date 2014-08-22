@@ -7,7 +7,7 @@ $(function() {
     $('#non-imported-data').toggle();
   });
 
-  $('.btn-add-data').click(function(e) {
+  $('#add-data').click(function(e) {
     e.preventDefault();
   });
 
@@ -15,18 +15,12 @@ $(function() {
     var fragmentClass = $(this).attr('class').split(' ')[0], // our custom fragment class is always the first..
         fragmentElements = $('.'+fragmentClass);
     fragmentElements.addClass('highlight');
-    fragmentElements.find('.btn').show();
+    fragmentElements.find('.remove-fragment').show();
   },
   function() {
     var fragmentClass = $(this).attr('class').split(' ')[0], // our custom fragment class is always the first..
         fragmentElements = $('.'+fragmentClass);
     fragmentElements.removeClass('highlight');
-    fragmentElements.find('.btn').hide();
-  });
-
-  // always reload modals
-  $('.modal').on('hidden.bs.modal', function() {
-    $(this).removeData();
-    $(this).empty();
+    fragmentElements.find('.remove-fragment').hide();
   });
 });

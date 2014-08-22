@@ -3,7 +3,6 @@ module DclgStatsSelector
     include Mongoid::Document
     # include Persistence::ActiveModelInterface
 
-    field :finished, type: Boolean, default: false
     field :row_uris, type: Array, default: []
     field :secondary_row_uris, type: Array
     field :geography_type
@@ -58,14 +57,8 @@ module DclgStatsSelector
       nil
     end
 
-    def finish!
-      self.finished = true
-      self.save
-    end
-
     def deep_copy
-      Selector.new(self.attributes.except('_id').merge({
-        finished: false,
+      Selector.create(self.attributes.except('_id').merge({
         fragments: self.fragments.map(&:deep_copy)
       }))
     end

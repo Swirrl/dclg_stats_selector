@@ -33,11 +33,8 @@ Dummy::Application.configure do
   config.active_support.deprecation = :stderr
 
   PublishMyData.configure do |config|
-    config.sparql_endpoint = ENV.fetch("PMD_SPARQL_QUERY_ENDPOINT")
-    config.local_domain = 'pmdtest.dev'
-
-    config.downloads_s3_bucket = "publishmydata-dev"
-    config.aws_access_key_id = "AKIAIMGJ3RKNJJ6CVGTA"
-    config.aws_secret_access_key = "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"
+    config.sparql_endpoint = 'http://localhost:3030/pmdtest/sparql'
+    config.linked_data_root = 'http://linked.pmd'
+    config.request_root = 'http://request.pmd'
   end
 end

@@ -1,19 +1,26 @@
 require 'spec_helper'
 
 module DclgStatsSelector
-  describe SelectorsController do
+  describe SelectorsController, type: :controller do
     let(:selector) { FactoryGirl.create(:selector) }
 
-    describe "#preview" do
-      context "given an uploaded text file containing GSS codes" do
+    describe "#create" do
+      context "given an uploaded text file containing valid GSS codes" do
         let(:csv_upload) {
           temp_file = File.new(File.join(Rails.root, '../support/gss_etc.csv'))
           ActionDispatch::Http::UploadedFile.new(tempfile: temp_file, filename: File.basename(temp_file.path))
         }
 
-        it "should respond successfully" do
-          post :preview, csv_upload: csv_upload, use_route: :dclg_stats_selector
-          response.should be_success
+        before { GeographyTasks.create_some_gss_resources }
+
+        it "should redirect to show the selector, passing along import info" do
+          post :create, csv_upload: csv_upload, use_route: :dclg_stats_selector
+          expected_path = selector_path(assigns[:selector], imported: 2, not_imported: 'Ham,Beans,Eggs')
+          response.should redirect_to(expected_path)
+        end
+
+        it "should create a selector" do
+          expect { post :create, csv_upload: csv_upload, use_route: :dclg_stats_selector}.to change { Selector.count }.by(1)
         end
       end
 
@@ -24,12 +31,12 @@ module DclgStatsSelector
         }
 
         it "should respond successfully" do
-          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
-          response.should be_success
+          post :create, csv_upload: invalid_upload, use_route: :dclg_stats_selector
+          response.should be_bad_request
         end
 
         it "should flash an error message" do
-          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
+          post :create, csv_upload: invalid_upload, use_route: :dclg_stats_selector
           flash[:error].should_not be_nil
         end
       end
@@ -41,12 +48,12 @@ module DclgStatsSelector
         }
 
         it "should respond successfully" do
-          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
-          response.should be_success
+          post :create, csv_upload: invalid_upload, use_route: :dclg_stats_selector
+          response.should be_bad_request
         end
 
         it "should flash an error message" do
-          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
+          post :create, csv_upload: invalid_upload, use_route: :dclg_stats_selector
           flash[:error].should_not be_nil
         end
       end
@@ -58,12 +65,12 @@ module DclgStatsSelector
         }
 
         it "should respond successfully" do
-          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
-          response.should be_success
+          post :create, csv_upload: invalid_upload, use_route: :dclg_stats_selector
+          response.should be_bad_request
         end
 
         it "should flash an error message" do
-          post :preview, csv_upload: invalid_upload, use_route: :dclg_stats_selector
+          post :create, csv_upload: invalid_upload, use_route: :dclg_stats_selector
           flash[:error].should_not be_nil
         end
       end
@@ -75,12 +82,12 @@ module DclgStatsSelector
         }
 
         it "should respond successfully" do
-          post :preview, csv_upload: large_upload, use_route: :dclg_stats_selector
-          response.should be_success
+          post :create, csv_upload: large_upload, use_route: :dclg_stats_selector
+          response.should be_bad_request
         end
 
         it "should flash an error message" do
-          post :preview, csv_upload: large_upload, use_route: :dclg_stats_selector
+          post :create, csv_upload: large_upload, use_route: :dclg_stats_selector
           flash[:error].should_not be_nil
         end
       end
@@ -92,61 +99,48 @@ module DclgStatsSelector
         }
 
         it "should respond successfully" do
-          post :preview, csv_upload: upload, use_route: :dclg_stats_selector
-          response.should be_success
+          post :create, csv_upload: upload, use_route: :dclg_stats_selector
+          response.should be_bad_request
         end
 
         it "should flash an error message" do
-          post :preview, csv_upload: upload, use_route: :dclg_stats_selector
+          post :create, csv_upload: upload, use_route: :dclg_stats_selector
           flash[:error].should_not be_nil
         end
       end
     end
 
-    describe '#edit' do
+    describe '#show' do
       it 'should respond successfully' do
-        get :edit, id: selector.to_param, use_route: :dclg_stats_selector
+        get :show, id: selector.to_param, use_route: :dclg_stats_selector
         response.should be_success
       end
 
-      context 'given a finished selector' do
-        before { selector.finish! }
+      context "given an imported rows count" do
+        let(:imported_count) { 1234 }
+        let(:non_gss_codes) { ['Ham', 'Beans', 'Eggs'] }
 
-        it 'should redirect to show' do
-          get :edit, id: selector.to_param, use_route: :dclg_stats_selector
-          response.should redirect_to(selector)
+        it 'should assign the imported count' do
+          get :show, id: selector.to_param, imported: imported_count, not_imported: non_gss_codes.join(','), use_route: :dclg_stats_selector
+          expect(assigns[:imported_count]).to eq(imported_count)
         end
-      end
-    end
 
-    describe '#show' do
-      it 'should redirect to edit' do
-        get :show, id: selector.to_param, use_route: :dclg_stats_selector
-        response.should redirect_to( [:edit, selector] )
-      end
-
-      context 'given a finished selector' do
-        before { selector.finish! }
-
-        it 'should respond successfully' do
-          response.should be_success
+        it 'should assign the non-imported gss codes' do
+          get :show, id: selector.to_param, imported: imported_count, not_imported: non_gss_codes.join(','), use_route: :dclg_stats_selector
+          expect(assigns[:non_gss_codes]).to eq(non_gss_codes)
         end
       end
     end
 
     describe '#download' do
-      it 'should redirect to edit' do
+      it 'should respond with valid csv' do
         get :download, id: selector.to_param, use_route: :dclg_stats_selector
-        response.should redirect_to( [:edit, selector] )
+        CSV.parse(response.body).should_not be_empty
       end
 
-      context 'given a finished selector' do
-        before { selector.finish! }
-
-        it 'should respond with valid csv' do
-          get :download, id: selector.to_param, use_route: :dclg_stats_selector
-          CSV.parse(response.body).should_not be_empty
-        end
+      it 'should make a copy of the given selector' do
+        get :download, id: selector.to_param, use_route: :dclg_stats_selector
+        expect(assigns[:selector].id).to_not eq(selector.id)
       end
     end
   end
