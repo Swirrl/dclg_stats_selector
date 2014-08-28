@@ -1,33 +1,50 @@
-.stripe
-  =fullwidth do
-    = render partial: 'imported', locals: { row_count: @imported_count, non_gss_codes: @non_gss_codes } if @imported_count
+.pmd
+	= render 'showcase/warnings'
 
-    .tuple
-      .predicate URI
-      .object= selector_url(@selector)
+.stripe.pmd.visible_when_javascript_available.hidden_for_mobile
+	= row do
+		.pmd_box_full{style:"margin-top:24px;"}
+			.predicate Productivity Tool
+			%h2 
+				=STATSELECTOR_DISPLAY_NAME
+			%p
+				Choose statistical data from across the whole range of OpenDataCommunities datasets, and compile them into a spreadsheet for download.
+	- if @imported_count
+		= render partial: 'imported', locals: { row_count: @imported_count, non_gss_codes: @non_gss_codes } 
 
-    %section
-      %header PREVIEW
-      %table
-        = render 'snapshot', snapshot: @snapshot
-        %tfoot
-          %tr
-            %td &hellip;
-            - if @snapshot.has_secondary_row_uris?
-              %td
-            - @selector.fragments.each do |fragment|
-              %th.fragment-actions{ colspan: fragment.volume_of_selected_cube, class: dom_class_for_fragment(fragment) }
-                = link_to selector_fragment_path(@selector, id: fragment.id), class: 'remove-fragment', method: :delete do
-                  Remove Data
-      .actions
-        = link_to datasets_selector_fragments_path(@selector), class: 'btn', id: 'add-data-button', remote: true do
-          Add Data
-        = link_to download_selector_path(@selector), class: 'btn' do
-          Download
-        :javascript
-          $('#add-data-button').click(function() {
-            $('.spin').show();
-          });
-    %section#add-data
-      .spin(style="display: none;")
-        = image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'
+	= row do
+		.pmd_box_full
+			%h3.divider Step 2: Select Data
+	= row do
+		.pmd_box_full
+			.predicate Spreadsheet preview
+			%table
+				= render 'snapshot', snapshot: @snapshot
+				%tfoot
+					%tr
+						%td &hellip;
+						- if @snapshot.has_secondary_row_uris?
+							%td
+						- @selector.fragments.each do |fragment|
+							%th.fragment-actions{ colspan: fragment.volume_of_selected_cube, class: dom_class_for_fragment(fragment) }
+								= link_to selector_fragment_path(@selector, id: fragment.id), class: 'remove-fragment', method: :delete do
+									Remove Data
+	= row do
+		.pmd_box_full
+			.actions
+				= link_to datasets_selector_fragments_path(@selector), class: 'btn mini', id: 'add-data-button', remote: true do
+					Add Data
+				- if @selector.fragments.present?
+					= link_to download_selector_path(@selector), class: 'btn' do
+						Download
+				:javascript
+					$('#add-data-button').click(function() {
+						$('.spin').show();
+					});
+	= row do
+		.pmd_box_full
+			#add-data
+				.spin(style="display: none;")
+					= image_tag 'publish_my_data/dclg_stats_selector/spinner.gif' 
+
+		/ = selector_url(@selector)

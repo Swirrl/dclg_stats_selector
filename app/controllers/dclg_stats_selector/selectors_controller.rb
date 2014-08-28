@@ -1,5 +1,6 @@
 module DclgStatsSelector
   class SelectorsController < PublishMyData::ApplicationController
+
     before_filter :get_selector, only: [ :show, :download ]
     before_filter :crumbs
 
@@ -105,7 +106,7 @@ module DclgStatsSelector
     end
 
     def no_file_uploaded
-      flash.now[:error] = 'Please select a valid .csv file'
+      flash.now[:error] = 'Please provide a valid .csv or .txt file'
       render :new, status: :bad_request
     end
 

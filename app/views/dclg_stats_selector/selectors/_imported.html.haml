@@ -1,13 +1,22 @@
-.imported
-  = pluralize(row_count, 'row')
-  imported.
+= row do
+	.pmd_box_full
+		.predicate Geography imported
+= fullwidth do
+	%aside.success
+		%span
+			%strong
+				= pluralize(row_count, 'row')
+			sucessfully imported.
 - unless @non_gss_codes.empty?
-  .not-imported
-    = pluralize(non_gss_codes.size, 'row')
-    not imported.
-    = link_to 'Show data', '#', id: 'reveal-non-imported-data'
-    %code#non-imported-data(style="display: none;")
-      %pre
-        - non_gss_codes.each do |non_gss_code|
-          = non_gss_code
-          \
+	= fullwidth do
+		%aside.warning
+			%span
+				%strong
+					= pluralize(non_gss_codes.size, 'row')
+				not understood.
+				= link_to 'Show data', '#', id: 'reveal-non-imported-data'
+				#non-imported-data(style="display: none; padding:10px; margin:10px; font-size:0.8em; background:#fff;")
+					%ul
+						- non_gss_codes.each do |non_gss_code|
+							%li
+								= non_gss_code
