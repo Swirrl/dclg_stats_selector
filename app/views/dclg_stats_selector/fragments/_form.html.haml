@@ -13,48 +13,56 @@
 			= link_to '(change dataset)', datasets_selector_fragments_path(@selector), id: 'pick-again', remote: true
 
 	= form_tag selector_fragments_path(@selector), id: 'bf' do
-		= row do
-			.pmd_box_full{style:"margin-top:24px;"}
-				.predicate Selected data
-				= form_tag selector_fragments_path(@selector), id: 'bf' do
-					= hidden_field_tag :dataset_uri, @dataset.uri
-
-				%p#no-filters
-					%em All possible combinations of dataset dimension are currently selected. To reduce the amount of data, select some dimension values to filter by.
-				#filters(style="display: none;")
-					%h3 Filtered by
-					#filter-lists
-						- @dimensions.each do |dimension|
-							.dimension
-								%em.all-values
-									All
-									= dimension.label.pluralize
-								%ul(style="display: none;")
-									%li.dimension-label= dimension.label
-									- dimension.values.each do |dimension_value|
-										%li{'id' => dom_id_for_dimension_value(dimension_value, 'filter'), 'style' => 'display: none;'}
-											= dimension_value[:label]
-											= link_to '#', class: 'remove-dimension-value' do
-												&times;
-		= row do
-			.pmd_box_full
-				#filter-options
-					%h2 Filter by &hellip;
-					%ul#dimensions
-						- @dimensions.each do |dimension|
-							%li.dimension
-								= hidden_field_tag "dataset_dimensions[#{dimension.uri}]", '', class: 'selected-values'
-								= hidden_field_tag "all_dataset_dimensions[#{dimension.uri}]", dimension.values.map{|v| v[:uri]}.join(', ')
-								%h3
-									= dimension.label
-								%ul
-									- dimension.values.each do |dimension_value|
-										%li{'id' => dom_id_for_dimension_value(dimension_value)}
-											= link_to dimension_value[:label], '#', 'data-uri' =>  dimension_value[:uri], 'class' => 'dimension-value'
+		= hidden_field_tag :dataset_uri, @dataset.uri
+		- if choice_of_columns_available?(@dimensions)
+			= row do
+				.pmd_box_full{style:"margin-top:24px;"}
+					.predicate Selected data
+					%p#no-filters
+						%em All possible combinations of dataset dimension are currently selected.
+					#filters(style="display: none;")
+						%p Adding data which matches
+						#filter-lists
+							- @dimensions.each do |dimension|
+								.dimension
+									%em.all-values
+										All
+										= dimension.label.pluralize
+									%ul(style="display: none;")
+										%li.dimension-label= dimension.label
+										- dimension.values.each do |dimension_value|
+											%li{'id' => dom_id_for_dimension_value(dimension_value, 'filter'), 'style' => 'display: none;'}
+												= dimension_value[:label]
+												= link_to '#', class: 'remove-dimension-value' do
+													&times;
+			= row do
+				.pmd_box_full
+					#filter-options
+						.predicate Columns
+						%p
+							To refine your selection, choose which columns you'd like to add to your spreadsheet:
+						#dimensions
+							- @dimensions.each do |dimension|
+								.dimension
+									= hidden_field_tag "dataset_dimensions[#{dimension.uri}]", '', class: 'selected-values'
+									= hidden_field_tag "all_dataset_dimensions[#{dimension.uri}]", dimension.values.map{|v| v[:uri]}.join(', ')
+									%h5
+										= dimension.label
+									%ul
+										- dimension.values.each do |dimension_value|
+											%li{'id' => dom_id_for_dimension_value(dimension_value)}
+												= link_to dimension_value[:label], '#', 'data-uri' =>  dimension_value[:uri], 'class' => 'dimension-value'
+		- else
+			= row do
+				.pmd_box_full{style:"margin-top:24px;"}
+					.predicate Selected data
+					%p
+						The selected dataset contains has one dimension of data and will add one column.
 		= row do
 			.pmd_box_full
 				.submit.primary
-					= submit_tag "Add #{column_count(@dimensions)} columns to spreadsheet", id: 'submit-fragment', class:'btn mini'
+					- label = "#{column_count(@dimensions).to_s} " + (column_count(@dimensions) == 1 ? "column" : "columns")
+					= submit_tag "Add #{label}", id: 'submit-fragment', class:'btn mini'
 
 :javascript
 	var addValueWithAnchor = function(anchor) {

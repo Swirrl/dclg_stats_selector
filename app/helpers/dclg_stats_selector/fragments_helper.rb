@@ -42,5 +42,10 @@ module DclgStatsSelector
       end
       grouped_options_for_select(options_as_array)
     end
+
+    def choice_of_columns_available?(dimensions)
+      !(dimensions.one? && dimensions.first.values.one?)
+    end
+
   end
 end
