@@ -14,7 +14,7 @@
 				%strong
 					= pluralize(non_gss_codes.size, 'row')
 				not understood.
-				= link_to 'Show data', '#', id: 'reveal-non-imported-data'
+				= link_to 'Show rejected rows', '#', id: 'reveal-non-imported-data'
 				#non-imported-data(style="display: none; padding:10px; margin:10px; font-size:0.8em; background:#fff;")
 					%ul
 						- non_gss_codes.each do |non_gss_code|

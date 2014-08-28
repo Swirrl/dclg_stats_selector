@@ -1,13 +1,15 @@
-#select-dataset
-  %h3 Add data
-  = form_tag new_selector_fragment_path(@selector), id: 'nsf', method: :get, remote: true do
-    = select_tag :dataset_uri, options_for_select_from_tree(@tree), class: 'form-control'
-    = submit_tag 'Select Dataset', class: 'btn', id: 'select-dataset-button'
-    .spin(style="display: none;")
-      = image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'
+= row do
+	.pmd_box_full
+		#select-dataset
+			.predicate Source dataset
+			= form_tag new_selector_fragment_path(@selector), id: 'nsf', method: :get, remote: true do
+				= select_tag :dataset_uri, options_for_select_from_tree(@tree)
+				= submit_tag 'Choose this dataset', class: 'btn mini', id: 'select-dataset-button'
+				.spin(style="display: none;")
+					= image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'
 
-  :javascript
-    $('#select-dataset-button').click(function() {
-      $('.spin').show();
-      $('#nsf').submit();
-    });
+			:javascript
+				$('#select-dataset-button').click(function() {
+					$('.spin').show();
+					$('#nsf').submit();
+				});

@@ -1,29 +1,29 @@
 %thead
-  -# Hack to skip the dataset name, as otherwise we'd have to either
-  -# have different snapshot generation strategies for HTML and CSV,
-  -# or write a HTMLBuilder to correspond with CSVBuilder and stop using
-  -# this template (which is probably the better solution overall).
-  -# Note that some datasets on opendatacommunities.org have the
-  -# measure property name "Observation" so they actually benefit from
-  -# naming the dataset, but we can't handle differences like that here.
-  - snapshot.header_rows.drop(1).each do |header_row|
-    %tr
-      %td
-      - if snapshot.has_secondary_row_uris?
-        %td
-      - header_row.each do |header_column|
-        - if header_column.type == :blank
-          %th{ colspan: header_column.width, class: dom_class_for_fragment(header_column) }
-        - else
-          %th.hardwrap{ colspan: header_column.width, class: dom_class_for_fragment(header_column) }= header_column.label
+	-# Hack to skip the dataset name, as otherwise we'd have to either
+	-# have different snapshot generation strategies for HTML and CSV,
+	-# or write a HTMLBuilder to correspond with CSVBuilder and stop using
+	-# this template (which is probably the better solution overall).
+	-# Note that some datasets on opendatacommunities.org have the
+	-# measure property name "Observation" so they actually benefit from
+	-# naming the dataset, but we can't handle differences like that here.
+	- snapshot.header_rows.drop(1).each do |header_row|
+		%tr
+			%td
+			- if snapshot.has_secondary_row_uris?
+				%td
+			- header_row.each do |header_column|
+				- if header_column.type == :blank
+					%th{ colspan: header_column.width, class: dom_class_for_fragment(header_column) }
+				- else
+					%th.hardwrap{ colspan: header_column.width, class: dom_class_for_fragment(header_column) }= header_column.label
 %tbody
-  - snapshot.table_rows.each.with_index do |row, index|
-    %tr
-      - if snapshot.has_secondary_row_uris?
-        %th.secondary= row.secondary_label
-      %th= row.label
-      - row.each do |cell|
-        %td{ class: dom_class_for_fragment(cell) }= cell
-      - if @selector.empty? && index == 0
-        %td.intro{rowspan: "#{ @snapshot.table_rows.size + 1 }"}
-          %p Get started! Add some column data from a dataset by clicking on 'Add Data' below.
+	- snapshot.table_rows.each.with_index do |row, index|
+		%tr
+			- if snapshot.has_secondary_row_uris?
+				%th.secondary= row.secondary_label
+			%th= row.label
+			- row.each do |cell|
+				%td{ class: dom_class_for_fragment(cell) }= cell
+			- if @selector.empty? && index == 0
+				%td.intro{rowspan: "#{ @snapshot.table_rows.size + 1 }"}
+					%p Get started! Add some column data from a dataset by clicking on 'Add Data' below.
