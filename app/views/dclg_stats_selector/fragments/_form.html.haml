@@ -1,12 +1,13 @@
 = row do
 	.pmd_box_full
+		.spin(style="display: none;")
+			= image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'
 		#build-fragment
 			.predicate Source Dataset
 			%strong
 				= @dataset.title
-			= link_to '[change]', datasets_selector_fragments_path(@selector), id: 'pick-again', remote: true
-			.spin(style="display: none;")
-				= image_tag 'publish_my_data/dclg_stats_selector/spinner.gif'
+			= link_to '(change dataset)', datasets_selector_fragments_path(@selector), id: 'pick-again', remote: true
+
 
 			= form_tag selector_fragments_path(@selector), id: 'bf' do
 				= hidden_field_tag :dataset_uri, @dataset.uri
@@ -148,4 +149,5 @@
 				});
 				$('#pick-again').click(function() {
 					$('.spin').show();
+					$('#build-fragment').hide();
 				});
