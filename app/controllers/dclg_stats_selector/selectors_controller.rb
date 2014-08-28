@@ -86,7 +86,7 @@ module DclgStatsSelector
 
     def crumbs
       initialize_empty_crumbtrail
-      prepend_crumb('Spreadsheet Builder', new_selector_path)
+      prepend_crumb(STATSELECTOR_DISPLAY_NAME, new_selector_path)
     end
 
     def invalid_upload

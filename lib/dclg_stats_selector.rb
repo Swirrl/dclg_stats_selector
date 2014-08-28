@@ -9,3 +9,5 @@ Dir[File.expand_path('../../app/models/concerns/**/*.rb', __FILE__)].each {|f| r
 
 module DclgStatsSelector
 end
+
+STATSELECTOR_DISPLAY_NAME = "Stat Selector"
