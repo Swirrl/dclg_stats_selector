@@ -25,6 +25,13 @@
 							%th.fragment-actions{ colspan: fragment.volume_of_selected_cube, class: dom_class_for_fragment(fragment) }
 								= link_to selector_fragment_path(@selector, id: fragment.id), class: 'remove-fragment', method: :delete do
 									Remove Data
+			- if @selector.fragments.present?
+				= link_to download_selector_path(@selector), class: 'btn mini' do
+					Download
+				%div{style:'color:#ccc;'}
+					Permalink:
+					= selector_url(@selector)
+
 	= row do
 		.pmd_box_full
 			%h3.divider Step 2: Add Data
@@ -33,9 +40,6 @@
 			.actions
 				= link_to datasets_selector_fragments_path(@selector), class: 'btn mini', id: 'add-data-button', remote: true do
 					Add Data
-				- if @selector.fragments.present?
-					= link_to download_selector_path(@selector), class: 'btn' do
-						Download
 				:javascript
 					$('#add-data-button').click(function() {
 						$('.spin').show();
@@ -48,4 +52,3 @@
 				(preparing data)
 				= image_tag 'publish_my_data/dclg_stats_selector/spinner.gif' 
 
-	/ = selector_url(@selector)

@@ -24,7 +24,7 @@
 						%p Adding data which matches
 						#filter-lists{style:"padding: 10px;", class:'clearfix'}
 							- @dimensions.each do |dimension|
-								.dimension{style:'float:left; padding: 0 10px 10px 10px; margin-left:12px;'}
+								.dimension{style:'float:left; padding: 0 10px 10px 10px; margin-left:12px; width:25%;'}
 									%h5
 										= dimension.label
 									%em.all-values
@@ -43,7 +43,7 @@
 							To refine your selection, choose which columns you'd like to add to your spreadsheet:
 						#dimensions
 							- @dimensions.each do |dimension|
-								.dimension{style:'float:left; padding:12px; margin-left:12px;'}
+								.dimension{style:'float:left; padding:12px; margin-left:12px;  width:25%;'}
 									= hidden_field_tag "dataset_dimensions[#{dimension.uri}]", '', class: 'selected-values'
 									= hidden_field_tag "all_dataset_dimensions[#{dimension.uri}]", dimension.values.map{|v| v[:uri]}.join(', ')
 									%h5
