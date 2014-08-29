@@ -9,6 +9,10 @@ module DclgStatsSelector
 
     embeds_many :fragments, class_name: 'DclgStatsSelector::Fragment'
 
+    def number_of_rows
+      row_uris.count
+    end
+
     def empty?
       fragments.empty?
     end

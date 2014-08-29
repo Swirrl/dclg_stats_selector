@@ -35,7 +35,7 @@
 									= link_to selector_fragment_path(@selector, id: fragment.id), class: 'remove-fragment', method: :delete do
 										Remove Columns
 				%small
-					Previewing the first 4 of TODO rows
+					= raw(row_count(@selector.number_of_rows, 10))
 			- if @selector.fragments.present?
 				= link_to download_selector_path(@selector), class: 'btn mini' do
 					Download

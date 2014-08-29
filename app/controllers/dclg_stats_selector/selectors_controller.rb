@@ -28,7 +28,7 @@ module DclgStatsSelector
     end
 
     def show
-      @snapshot = @selector.build_snapshot(row_limit: 7)
+      @snapshot = @selector.build_snapshot(row_limit: 10)
 
       if params[:imported]
         @imported_count = params[:imported].to_i
