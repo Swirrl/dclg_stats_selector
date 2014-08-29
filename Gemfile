@@ -14,7 +14,7 @@ gemspec
 # gem 'debugger'
 
 # gem 'publish_my_data', git: 'https://github.com/Swirrl/publish_my_data_2.git'
-gem 'publish_my_data', path: '../publish_my_data'
+gem 'publish_my_data', path: '../PublishMyData/_src'
 
 group :test, :development do
   gem "rspec-rails", "~> 2.0"

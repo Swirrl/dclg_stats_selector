@@ -15,16 +15,16 @@ feature "Preparing a Stats Selector document" do
       visit '/selectors/new'
     end
 
-    scenario 'Visitor uploads a file containing a mix of GSS codes and other text' do
+    scenario 'Visitor uploads a file containing a mix of GSS codes and other text' do 
       attach_file 'csv_upload', File.expand_path('spec/support/gss_etc.csv')
       click_on 'Upload'
 
-      page.should have_content 'PREVIEW'
+      page.should have_content 'Preview'
 
-      page.should have_content '2 rows imported'
-      page.should have_content '3 rows not imported'
+      page.should have_content '2 rows sucessfully imported'
+      page.should have_content '3 rows not understood'
 
-      click_on 'Show data'
+      click_on 'Show rejected rows'
       find('#non-imported-data').should have_content 'Ham'
       find('#non-imported-data').should have_content 'Beans'
       find('#non-imported-data').should have_content 'Eggs'
@@ -37,7 +37,7 @@ feature "Preparing a Stats Selector document" do
       attach_file 'csv_upload', File.expand_path('spec/support/dog.gif')
       click_on 'Upload'
 
-      page.should have_content 'Upload Data'
+      page.should have_content 'Upload Geography Selection File'
       page.should have_content 'The uploaded file did not contain valid CSV data'
     end
 
@@ -45,15 +45,15 @@ feature "Preparing a Stats Selector document" do
       attach_file 'csv_upload', File.expand_path('spec/support/gss_mixed.csv')
       click_on 'Upload'
 
-      page.should have_content 'Upload Data'
+      page.should have_content 'Upload Geography Selection File'
       page.should have_content 'The uploaded file should contain GSS codes at either LSOA or Local Authority level.'
     end
 
     scenario 'Visitor just clicks upload without selecting a .csv file' do
       click_on 'Upload'
 
-      page.should have_content 'Upload Data'
-      page.should have_content 'Please select a valid .csv file'
+      page.should have_content 'Upload Geography Selection File'
+      page.should have_content 'Please provide a valid .csv or .txt file'
     end
   end
 
@@ -69,11 +69,11 @@ feature "Preparing a Stats Selector document" do
       attach_file 'csv_upload', File.expand_path('spec/support/postcodes.csv')
       click_on 'Upload'
 
-      page.should have_content 'PREVIEW'
-      page.should have_content '3 rows imported'
-      page.should have_content '2 rows not imported'
+      page.should have_content 'Preview'
+      page.should have_text '3 rows sucessfully imported'
+      page.should have_text '2 rows not understood'
 
-      click_on 'Show data'
+      click_on 'Show rejected rows'
       find('#non-imported-data').should have_content 'V10 L1N'
       find('#non-imported-data').should have_content 'R0 8OT'
 
@@ -89,15 +89,15 @@ feature "Preparing a Stats Selector document" do
       attach_file 'csv_upload', File.expand_path('spec/support/dog.gif')
       click_on 'Upload'
 
-      page.should have_content 'Upload Data'
+      page.should have_content 'Upload Geography Selection File'
       page.should have_content 'The uploaded file did not contain valid CSV data'
     end
 
     scenario 'Visitor just clicks upload without selecting a .csv file' do
       click_on 'Upload'
 
-      page.should have_content 'Upload Data'
-      page.should have_content 'Please select a valid .csv file'
+      page.should have_content 'Upload Geography Selection File'
+      page.should have_content 'Please provide a valid .csv or .txt file'
     end
   end
 
@@ -115,9 +115,9 @@ feature "Preparing a Stats Selector document" do
       page.should have_css 'div#select-dataset'
 
       select dataset.title, from: 'dataset_uri'
-      click_on 'Select Dataset'
+      click_on 'Choose this dataset'
 
-      page.should have_content 'Dataset:'
+      page.should have_content 'Dataset'
       page.should have_content dataset.title
     end
   end
@@ -131,14 +131,14 @@ feature "Preparing a Stats Selector document" do
       visit "/selectors/#{selector.id}"
       find('#add-data-button').trigger(:click)
       select dataset.title, from: 'dataset_uri'
-      click_on 'Select Dataset'
+      click_on 'Choose this dataset'
     end
 
     scenario 'Visitor selects a dimension filter, leaving another open' do
       click_on '2013 Q1'
 
-      page.should have_content 'Filtered by'
-      page.should have_content 'All Ethnicities'
+      page.should have_content 'Selected data'
+      page.should have_content 'Ethnicity Any'
       # filter should have moved from the list of options to the list of applied filters
       find('#filters').should have_content '2013 Q1'
       find('#filter-options').should_not have_content '2013 Q1'
@@ -149,8 +149,8 @@ feature "Preparing a Stats Selector document" do
       find('#filters').should have_content '2013 Q1'
       find('#filter-options').should_not have_content '2013 Q1'
 
-      find('#filters').click_link '×'
-      page.should have_content 'All possible combinations of dataset dimension are currently chosen'
+      click_on '2013 Q1'
+      page.should have_content 'All possible combinations of dataset dimension are currently selected'
       page.should_not have_css('#filters')
       find('#filter-options').should have_content '2013 Q1'
     end
@@ -165,7 +165,7 @@ feature "Preparing a Stats Selector document" do
       visit "/selectors/#{selector.id}"
       find('#add-data-button').trigger(:click)
       select dataset.title, from: 'dataset_uri'
-      click_on 'Select Dataset'
+      click_on 'Choose this dataset'
     end
 
     context '... filtering on all dimensions' do
@@ -177,7 +177,7 @@ feature "Preparing a Stats Selector document" do
       scenario 'Visitor completes the fragment creation process' do
         click_on 'Add 1 column of data'
 
-        page.should have_content 'PREVIEW'
+        page.should have_content 'Preview'
         page.should have_content '2013 Q1'
         page.should have_content 'Mixed'
         # page.should have_content '234'
@@ -193,7 +193,7 @@ feature "Preparing a Stats Selector document" do
       scenario 'Visitor completes the fragment creation process' do
         click_on 'Add 3 columns of data'
 
-        page.should have_content 'PREVIEW'
+        page.should have_content 'Preview'
         page.should have_content 'White'
         page.should have_content 'Mixed'
         page.should have_content 'Black' # all values for unfiltered dimension are present
@@ -221,7 +221,7 @@ feature "Preparing a Stats Selector document" do
 
     scenario 'Visitor removes some data from the selector', js: true do
       find('th.fragment-actions').hover
-      click_link 'Remove Data'
+      click_link 'Remove Columns'
       page.should_not have_content '2013 Q1'
     end
   end

@@ -1,5 +1,13 @@
 .pmd
-	= render 'showcase/warnings'
+	= fullwidth do
+		%aside.error.hidden_when_javascript_available.hidden_for_mobile
+			%span
+				Sorry. This interactive requires <strong>JavaScript</strong>.
+
+	= fullwidth do
+		%aside.error.hidden_for_not_mobile
+			%span
+				Sorry. This interactive is not available on devices with small screens.
 
 .stripe.pmd.visible_when_javascript_available.hidden_for_mobile
 	= row do
