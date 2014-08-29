@@ -22,28 +22,28 @@
 						%em All possible combinations of dataset dimension are currently selected.
 					#filters(style="display: none;")
 						%p Adding data which matches
-						#filter-lists
+						#filter-lists{style:"padding: 10px;", class:'clearfix'}
 							- @dimensions.each do |dimension|
-								.dimension
+								.dimension{style:'float:left; padding: 0 10px 10px 10px; margin-left:12px;'}
+									%h5
+										= dimension.label
 									%em.all-values
-										All
-										= dimension.label.pluralize
+										Any
+										/= dimension.label.pluralize
 									%ul(style="display: none;")
-										%li.dimension-label= dimension.label
+										/%li.dimension-label= dimension.label
 										- dimension.values.each do |dimension_value|
 											%li{'id' => dom_id_for_dimension_value(dimension_value, 'filter'), 'style' => 'display: none;'}
-												= dimension_value[:label]
 												= link_to '#', class: 'remove-dimension-value' do
-													&times;
+													= dimension_value[:label]
 			= row do
 				.pmd_box_full
-					#filter-options
-						.predicate Columns
+					#filter-options{style:"background: #f8f8f8; padding: 10px;", class:'clearfix'}
 						%p
 							To refine your selection, choose which columns you'd like to add to your spreadsheet:
 						#dimensions
 							- @dimensions.each do |dimension|
-								.dimension
+								.dimension{style:'float:left; padding:12px; margin-left:12px;'}
 									= hidden_field_tag "dataset_dimensions[#{dimension.uri}]", '', class: 'selected-values'
 									= hidden_field_tag "all_dataset_dimensions[#{dimension.uri}]", dimension.values.map{|v| v[:uri]}.join(', ')
 									%h5
@@ -67,7 +67,7 @@
 :javascript
 	var addValueWithAnchor = function(anchor) {
 		var uri = anchor.attr('data-uri'),
-				input = anchor.parents('li.dimension').find('input.selected-values'),
+				input = anchor.parents('.dimension').find('input.selected-values'),
 				dimensionValues;
 
 		if (input.val().length == 0) {
@@ -80,7 +80,7 @@
 	},
 	removeValueWithAnchor = function(anchor) {
 		var uri = anchor.attr('data-uri'),
-				input = anchor.parents('li.dimension').find('input.selected-values'),
+				input = anchor.parents('.dimension').find('input.selected-values'),
 				dimensionValues = input.val().split(', '),
 				idx;
 
@@ -98,7 +98,7 @@
 
 			if (ul.is(':hidden')) {
 				// all values
-				dimCount = $('#dimensions li.dimension').eq(idx).find('li').size();
+				dimCount = $('#dimensions .dimension').eq(idx).find('li').size();
 			} else  {
 				// selected values
 				dimCount = ul.find('li:visible').not('.dimension-label').size();
@@ -111,7 +111,6 @@
 
 	$('a.dimension-value').click(function(e) {
 		e.preventDefault();
-
 		var filterOption = $(this).parent(),
 				filter = $('#filter-' + filterOption.attr('id')),
 				filterList = filter.parent();
