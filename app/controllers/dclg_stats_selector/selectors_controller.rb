@@ -2,12 +2,12 @@ module DclgStatsSelector
   class SelectorsController < PublishMyData::ApplicationController
 
     before_filter :get_selector, only: [ :show, :download ]
-    before_filter :crumbs
+  #  before_filter :crumbs
 
     rescue_from GeographyService::TooManyGSSCodesError, with: :too_many_gss_codes
     rescue_from GeographyService::TooManyGSSCodeTypesError, with: :mixed_gss_codes
 
-    include PublishMyData::CrumbtrailRendering
+   # include PublishMyData::CrumbtrailRendering
     
     def new
     end
@@ -85,10 +85,10 @@ module DclgStatsSelector
       data
     end
 
-    def crumbs
-      initialize_empty_crumbtrail
-      prepend_crumb(STATSELECTOR_DISPLAY_NAME, new_selector_path)
-    end
+    # def crumbs
+    #   initialize_empty_crumbtrail
+    #   prepend_crumb(STATSELECTOR_DISPLAY_NAME, new_selector_path)
+    # end
 
     def invalid_upload
       flash.now[:error] = 'The uploaded file did not contain valid CSV data, please check and try again.'
