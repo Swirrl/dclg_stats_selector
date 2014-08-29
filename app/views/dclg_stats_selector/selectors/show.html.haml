@@ -14,17 +14,20 @@
 	= row do
 		.pmd_box_full{style:"margin-top:24px;"}
 			.predicate Spreadsheet preview
-			%table
-				= render 'snapshot', snapshot: @snapshot
-				%tfoot
-					%tr
-						%td &hellip;
-						- if @snapshot.has_secondary_row_uris?
-							%td
-						- @selector.fragments.each do |fragment|
-							%th.fragment-actions{ colspan: fragment.volume_of_selected_cube, class: dom_class_for_fragment(fragment) }
-								= link_to selector_fragment_path(@selector, id: fragment.id), class: 'remove-fragment', method: :delete do
-									Remove Data
+			#preview
+				%table
+					= render 'snapshot', snapshot: @snapshot
+					%tfoot
+						%tr
+							%td &nbsp;
+							- if @snapshot.has_secondary_row_uris?
+								%td
+							- @selector.fragments.each do |fragment|
+								%th.fragment-actions{ colspan: fragment.volume_of_selected_cube, class: dom_class_for_fragment(fragment) }
+									= link_to selector_fragment_path(@selector, id: fragment.id), class: 'remove-fragment', method: :delete do
+										Remove Columns
+				%small
+					Previewing the first 4 of TODO rows
 			- if @selector.fragments.present?
 				= link_to download_selector_path(@selector), class: 'btn mini' do
 					Download
