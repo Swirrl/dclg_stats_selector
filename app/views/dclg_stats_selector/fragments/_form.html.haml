@@ -14,6 +14,11 @@
 
 	= form_tag selector_fragments_path(@selector), id: 'bf' do
 		= hidden_field_tag :dataset_uri, @dataset.uri
+		- @dimensions.each do |dimension|
+			%div{'id' => dimension.uri.parameterize}
+				= hidden_field_tag "dataset_dimensions[#{dimension.uri}]", '', class: 'selected-values'
+				= hidden_field_tag "all_dataset_dimensions[#{dimension.uri}]", dimension.values.map{|v| v[:uri]}.join(', ')
+
 		- if choice_of_columns_available?(@dimensions)
 			= row do
 				.pmd_box_full{style:"margin-top:24px;"}
@@ -44,14 +49,12 @@
 						#dimensions
 							- @dimensions.each do |dimension|
 								.dimension{style:'float:left; padding:12px; margin-left:12px;  width:25%;'}
-									= hidden_field_tag "dataset_dimensions[#{dimension.uri}]", '', class: 'selected-values'
-									= hidden_field_tag "all_dataset_dimensions[#{dimension.uri}]", dimension.values.map{|v| v[:uri]}.join(', ')
 									%h5
 										= dimension.label
 									%ul
 										- dimension.values.each do |dimension_value|
 											%li{'id' => dom_id_for_dimension_value(dimension_value)}
-												= link_to dimension_value[:label], '#', 'data-uri' =>  dimension_value[:uri], 'class' => 'dimension-value'
+												= link_to dimension_value[:label], '#', 'data-uri' =>  dimension_value[:uri], 'data-dimension' => dimension.uri.parameterize, 'class' => 'dimension-value'
 		- else
 			= row do
 				.pmd_box_full{style:"margin-top:24px;"}
@@ -67,7 +70,8 @@
 :javascript
 	var addValueWithAnchor = function(anchor) {
 		var uri = anchor.attr('data-uri'),
-				input = anchor.parents('.dimension').find('input.selected-values'),
+				el = $('#'+anchor.attr('data-dimension')),
+				input = el.find('input.selected-values'),
 				dimensionValues;
 
 		if (input.val().length == 0) {
@@ -80,7 +84,8 @@
 	},
 	removeValueWithAnchor = function(anchor) {
 		var uri = anchor.attr('data-uri'),
-				input = anchor.parents('.dimension').find('input.selected-values'),
+				el = $('#'+anchor.attr('data-dimension')),
+				input = el.find('input.selected-values'),
 				dimensionValues = input.val().split(', '),
 				idx;
 
