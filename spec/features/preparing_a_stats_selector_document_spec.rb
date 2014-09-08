@@ -15,7 +15,7 @@ feature "Preparing a Stats Selector document" do
       visit '/selectors/new'
     end
 
-    scenario 'Visitor uploads a file containing a mix of GSS codes and other text' do 
+    scenario 'Visitor uploads a file containing a mix of GSS codes and other text' do
       attach_file 'csv_upload', File.expand_path('spec/support/gss_etc.csv')
       click_on 'Upload'
 
