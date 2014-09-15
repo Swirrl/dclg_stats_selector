@@ -1,11 +1,15 @@
 module DclgStatsSelector
   class Selector
     include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+
     # include Persistence::ActiveModelInterface
 
     field :row_uris, type: Array, default: []
     field :secondary_row_uris, type: Array
     field :geography_type
+
+
 
     embeds_many :fragments, class_name: 'DclgStatsSelector::Fragment'
 

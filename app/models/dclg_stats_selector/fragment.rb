@@ -1,6 +1,7 @@
 module DclgStatsSelector
   class Fragment
     include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
 
     field :dataset_uri
     field :measure_property_uri
