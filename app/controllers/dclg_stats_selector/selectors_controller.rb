@@ -1,6 +1,8 @@
 module DclgStatsSelector
   class SelectorsController < PublishMyData::ApplicationController
 
+    layout 'stats_selector'
+
     before_filter :get_selector, only: [ :show, :download ]
   #  before_filter :crumbs
 
