@@ -71,7 +71,7 @@ module DclgStatsSelector
       # the controller
       uri_candidates =
         begin
-          CSV.read(upload.path).map(&:first)
+          CSV.read(upload.path).map{|a| a.first.to_s.strip}
         rescue ArgumentError, CSV::MalformedCSVError
           return nil
         end

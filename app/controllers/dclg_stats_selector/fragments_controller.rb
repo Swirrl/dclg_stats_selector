@@ -6,7 +6,9 @@ module DclgStatsSelector
 
     def datasets
       datasets = GeographyService.geographical_data_cubes(@selector.geography_type)
-      @tree = filtered_tree(build_site_trees.first, datasets)
+      
+      default_tree = build_site_trees.select{ |t| t.is_default_tree? }.first
+      @tree = filtered_tree(default_tree, datasets)
 
       respond_to do |format|
         format.html { render layout: false }

@@ -29,7 +29,7 @@ module DclgStatsSelector
     def options_for_select_from_tree(tree)
       # build up a hash containing group names (>-separated folder paths)
       options = {}
-      tree.each_leaf do |node|
+      tree.each_leaf do |node|        
         option = [node.content[:label], node.name] # label, URI
         opt_group = node.parentage.reverse.map{|n| n.content[:label]}.join(' > ')
         options[opt_group] ||= []
