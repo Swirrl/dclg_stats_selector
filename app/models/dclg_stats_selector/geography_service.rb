@@ -16,6 +16,7 @@ module DclgStatsSelector
       raise TooManyGSSCodesError if gss_codes.size > self.class.MAX_NUMBER_OF_GSS_CODES
 
       non_gss_codes = uri_candidates - gss_codes
+
       raise TooManyGSSCodeTypesError unless (geography_types.size == 1)
 
       # sort based on order of original candidates
@@ -68,8 +69,10 @@ module DclgStatsSelector
       query_results = Tripod::SparqlClient::Query.select(<<-SPARQL
         SELECT DISTINCT ?uri ?code ?type
         WHERE {
+           values ?type { <http://opendatacommunities.org/def/geography#LSOA>  <http://opendatacommunities.org/def/local-government/LocalAuthority> }    
+
           {
-            ?uri a <http://opendatacommunities.org/def/geography#LSOA> .
+            ?uri a <http://opendatacommunities.org/def/geography#LSOA> .    
             ?uri a ?type .
             ?uri <http://www.w3.org/2004/02/skos/core#notation> ?code .
           } UNION {
